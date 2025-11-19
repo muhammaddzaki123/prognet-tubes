@@ -72,7 +72,7 @@ public class HomeScreen extends JPanel {
 
         // Server status
         String serverIP = mainFrame.getGameClient().getServerIP();
-        JLabel serverLabel = UIUtils.createSubtitleLabel("📶 Connected to: " + serverIP);
+        JLabel serverLabel = UIUtils.createSubtitleLabel("📶 Connected to: " + (serverIP != null ? serverIP : "Not Connected"));
         serverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         serverLabel.setForeground(UIUtils.PRIMARY_GREEN);
         cardPanel.add(serverLabel);

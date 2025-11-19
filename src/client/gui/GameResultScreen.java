@@ -30,16 +30,14 @@ public class GameResultScreen extends JPanel {
 
         // Trophy Icon
         JLabel trophyLabel = new JLabel("🏆", SwingConstants.CENTER);
-        trophyLabel.setFont(new Font("Arial", Font.PLAIN, 80));
+        trophyLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 80));
         trophyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardPanel.add(trophyLabel);
 
         cardPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // Result Title
-        resultLabel = new JLabel("Game Over!", SwingConstants.CENTER);
-        resultLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 48));
-        resultLabel.setForeground(UIUtils.PRIMARY_PURPLE);
+        resultLabel = UIUtils.createTitleLabel("Game Over!", UIUtils.PRIMARY_PURPLE);
         resultLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardPanel.add(resultLabel);
 
@@ -53,12 +51,11 @@ public class GameResultScreen extends JPanel {
         // Player 1 Score Card
         JPanel player1Card = new JPanel();
         player1Card.setLayout(new BoxLayout(player1Card, BoxLayout.Y_AXIS));
-        player1Card.setBackground(new Color(220, 252, 231));
-        player1Card.setBorder(BorderFactory.createLineBorder(UIUtils.PRIMARY_GREEN, 3));
+        player1Card.setOpaque(false);
 
         player1InfoLabel = new JLabel("<html><center>Player 1<br><b>0</b><br>matches</center></html>");
-        player1InfoLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        player1InfoLabel.setForeground(UIUtils.PRIMARY_GREEN);
+        player1InfoLabel.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 18));
+        player1InfoLabel.setForeground(UIUtils.TEXT_DARK);
         player1InfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player1Card.add(Box.createVerticalGlue());
         player1Card.add(player1InfoLabel);
@@ -69,12 +66,11 @@ public class GameResultScreen extends JPanel {
         // Player 2 Score Card
         JPanel player2Card = new JPanel();
         player2Card.setLayout(new BoxLayout(player2Card, BoxLayout.Y_AXIS));
-        player2Card.setBackground(new Color(219, 234, 254));
-        player2Card.setBorder(BorderFactory.createLineBorder(UIUtils.PRIMARY_BLUE, 3));
+        player2Card.setOpaque(false);
 
         player2InfoLabel = new JLabel("<html><center>Player 2<br><b>0</b><br>matches</center></html>");
-        player2InfoLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        player2InfoLabel.setForeground(UIUtils.PRIMARY_BLUE);
+        player2InfoLabel.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 18));
+        player2InfoLabel.setForeground(UIUtils.TEXT_DARK);
         player2InfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player2Card.add(Box.createVerticalGlue());
         player2Card.add(player2InfoLabel);

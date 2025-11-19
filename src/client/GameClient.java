@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import javax.swing.SwingUtilities;
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -18,6 +20,7 @@ public class GameClient {
     private Consumer<Message> messageHandler;
     private boolean connected;
     private String serverIP;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public GameClient() {
         this.connected = false;
@@ -103,9 +106,11 @@ public class GameClient {
     }
 
     public void sendMessage(Message message) {
-        if (connected && out != null) {
-            out.println(message.toJson());
-            LOGGER.info("Sent: " + message.getType());
+        if (connected && out != null && !executorService.isShutdown()) {
+            executorService.submit(() -> {
+                out.println(message.toJson());
+                LOGGER.info("Sent: " + message.getType());
+            });
         }
     }
 
@@ -135,25 +140,30 @@ public class GameClient {
         sendMessage(new Message(MessageType.FLIP_CARD, data));
     }
 
-    public void disconnect() {
-        connected = false;
+    public void sendChatMessage(String chatMessage) {
+        JsonObject data = new JsonObject();
+        data.addProperty("message", chatMessage);
+        sendMessage(new Message(MessageType.CHAT_MESSAGE, data));
+    }
 
+    public void disconnect() {
         try {
-            if (out != null) {
+            if (out != null && connected) {
                 JsonObject data = new JsonObject();
                 sendMessage(new Message(MessageType.DISCONNECT, data));
             }
-            if (in != null)
-                in.close();
-            if (out != null)
-                out.close();
-            if (socket != null)
-                socket.close();
-        } catch (IOException e) {
-            LOGGER.warning("Error during disconnect: " + e.getMessage());
+        } finally {
+            connected = false;
+            executorService.shutdown();
+            try {
+                if (in != null) in.close();
+                if (out != null) out.close();
+                if (socket != null) socket.close();
+                LOGGER.info("Disconnected from server");
+            } catch (IOException e) {
+                LOGGER.warning("Error closing resources during disconnect: " + e.getMessage());
+            }
         }
-
-        LOGGER.info("Disconnected from server");
     }
 
     public boolean isConnected() {

@@ -108,6 +108,9 @@ public class MainFrame extends JFrame {
             case PLAYER_LEFT:
                 handlePlayerLeft(message);
                 break;
+            case CHAT_MESSAGE:
+                handleChatMessage(message);
+                break;
             case ERROR:
                 handleError(message);
                 break;
@@ -164,6 +167,12 @@ public class MainFrame extends JFrame {
         String playerName = message.getDataString("playerName");
         UIUtils.showInfo(this, playerName + " has left the game.");
         showScreen("HOME");
+    }
+
+    private void handleChatMessage(Message message) {
+        String sender = message.getDataString("sender");
+        String chatMessage = message.getDataString("message");
+        gameBoardScreen.addChatMessage(sender, chatMessage);
     }
 
     private void handleError(Message message) {

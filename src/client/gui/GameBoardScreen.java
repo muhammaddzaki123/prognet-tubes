@@ -19,6 +19,9 @@ public class GameBoardScreen extends JPanel {
     private List<MemoryCardPanel> cardPanels;
     private int playerNumber;
     private int flippedCount = 0;
+    private JTextArea chatArea;
+    private JTextField messageField;
+    private JPanel chatPanel;
 
     public GameBoardScreen(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -39,10 +42,17 @@ public class GameBoardScreen extends JPanel {
         JButton leaveButton = new JButton("← Leave Game");
         leaveButton.addActionListener(e -> {
             if (UIUtils.showConfirm(this, "Are you sure you want to leave the game?")) {
+                mainFrame.getGameClient().disconnect();
                 mainFrame.showScreen("HOME");
             }
         });
         headerPanel.add(leaveButton, BorderLayout.WEST);
+
+        JButton chatToggleButton = new JButton("💬 Chat");
+        chatToggleButton.addActionListener(e -> {
+            chatPanel.setVisible(!chatPanel.isVisible());
+        });
+        headerPanel.add(chatToggleButton, BorderLayout.EAST);
 
         contentPanel.add(headerPanel, BorderLayout.NORTH);
 
@@ -58,17 +68,16 @@ public class GameBoardScreen extends JPanel {
         // Player 1 Score
         JPanel player1Panel = new JPanel();
         player1Panel.setLayout(new BoxLayout(player1Panel, BoxLayout.Y_AXIS));
-        player1Panel.setBackground(new Color(220, 252, 231));
-        player1Panel.setBorder(BorderFactory.createLineBorder(UIUtils.PRIMARY_GREEN, 3));
+        player1Panel.setOpaque(false);
 
         player1NameLabel = new JLabel("Player 1");
-        player1NameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        player1NameLabel.setForeground(UIUtils.PRIMARY_GREEN);
+        player1NameLabel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 16));
+        player1NameLabel.setForeground(UIUtils.TEXT_DARK);
         player1NameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player1Panel.add(player1NameLabel);
 
         player1ScoreLabel = new JLabel("0");
-        player1ScoreLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        player1ScoreLabel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 36));
         player1ScoreLabel.setForeground(UIUtils.PRIMARY_GREEN);
         player1ScoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player1Panel.add(player1ScoreLabel);
@@ -78,17 +87,16 @@ public class GameBoardScreen extends JPanel {
         // Player 2 Score
         JPanel player2Panel = new JPanel();
         player2Panel.setLayout(new BoxLayout(player2Panel, BoxLayout.Y_AXIS));
-        player2Panel.setBackground(new Color(219, 234, 254));
-        player2Panel.setBorder(BorderFactory.createLineBorder(UIUtils.PRIMARY_BLUE, 3));
+        player2Panel.setOpaque(false);
 
         player2NameLabel = new JLabel("Player 2");
-        player2NameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        player2NameLabel.setForeground(UIUtils.PRIMARY_BLUE);
+        player2NameLabel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 16));
+        player2NameLabel.setForeground(UIUtils.TEXT_DARK);
         player2NameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player2Panel.add(player2NameLabel);
 
         player2ScoreLabel = new JLabel("0");
-        player2ScoreLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        player2ScoreLabel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 36));
         player2ScoreLabel.setForeground(UIUtils.PRIMARY_BLUE);
         player2ScoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         player2Panel.add(player2ScoreLabel);
@@ -99,13 +107,9 @@ public class GameBoardScreen extends JPanel {
 
         // Turn Indicator
         turnLabel = new JLabel("Your Turn!", SwingConstants.CENTER);
-        turnLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
+        turnLabel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 20));
         turnLabel.setForeground(UIUtils.PRIMARY_PURPLE);
-        turnLabel.setOpaque(true);
-        turnLabel.setBackground(Color.WHITE);
-        turnLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIUtils.PRIMARY_PURPLE, 2),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        turnLabel.setOpaque(false);
 
         JPanel turnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         turnPanel.setOpaque(false);
@@ -118,6 +122,33 @@ public class GameBoardScreen extends JPanel {
         centerPanel.add(gridPanel, BorderLayout.SOUTH);
 
         contentPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Chat Panel
+        chatPanel = new JPanel(new BorderLayout());
+        chatPanel.setPreferredSize(new Dimension(200, 0));
+        chatPanel.setOpaque(false);
+        chatPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+        chatPanel.setVisible(false);
+
+        chatArea = new JTextArea();
+        chatArea.setEditable(false);
+        chatArea.setLineWrap(true);
+        chatArea.setWrapStyleWord(true);
+        JScrollPane chatScrollPane = new JScrollPane(chatArea);
+        chatPanel.add(chatScrollPane, BorderLayout.CENTER);
+
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.setOpaque(false);
+        messageField = new JTextField();
+        messageField.addActionListener(e -> sendMessage());
+        messagePanel.add(messageField, BorderLayout.CENTER);
+        JButton sendButton = new JButton("Send");
+        sendButton.addActionListener(e -> sendMessage());
+        messagePanel.add(sendButton, BorderLayout.EAST);
+        chatPanel.add(messagePanel, BorderLayout.SOUTH);
+
+        contentPanel.add(chatPanel, BorderLayout.EAST);
+
         add(contentPanel, BorderLayout.CENTER);
     }
 
@@ -220,5 +251,19 @@ public class GameBoardScreen extends JPanel {
             turnLabel.setText("⏳ Opponent's Turn");
             turnLabel.setForeground(UIUtils.TEXT_LIGHT);
         }
+    }
+
+    private void sendMessage() {
+        String message = messageField.getText().trim();
+        if (!message.isEmpty()) {
+            mainFrame.getGameClient().sendChatMessage(message);
+            messageField.setText("");
+        }
+    }
+
+    public void addChatMessage(String sender, String message) {
+        SwingUtilities.invokeLater(() -> {
+            chatArea.append(String.format("[%s]: %s\n", sender, message));
+        });
     }
 }

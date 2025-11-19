@@ -6,6 +6,7 @@ public enum MessageType {
     JOIN_ROOM,
     START_GAME,
     FLIP_CARD,
+    CHAT_MESSAGE,
     DISCONNECT,
 
     // Server → Client

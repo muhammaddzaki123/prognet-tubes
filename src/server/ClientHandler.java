@@ -63,6 +63,9 @@ public class ClientHandler extends Thread {
                 case FLIP_CARD:
                     handleFlipCard(message);
                     break;
+                case CHAT_MESSAGE:
+                    handleChatMessage(message);
+                    break;
                 case DISCONNECT:
                     handleDisconnect();
                     break;
@@ -210,6 +213,21 @@ public class ClientHandler extends Thread {
                 currentRoom.broadcast(new Message(MessageType.GAME_OVER, gameOverData).toJson());
             }
         }
+    }
+
+    private void handleChatMessage(Message message) {
+        if (currentRoom == null) {
+            sendError("Not in a room");
+            return;
+        }
+
+        String chatMessage = message.getDataString("message");
+
+        JsonObject data = new JsonObject();
+        data.addProperty("sender", playerName);
+        data.addProperty("message", chatMessage);
+
+        currentRoom.broadcast(new Message(MessageType.CHAT_MESSAGE, data).toJson());
     }
 
     private void handleDisconnect() {

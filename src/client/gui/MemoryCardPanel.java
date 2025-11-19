@@ -112,76 +112,69 @@ public class MemoryCardPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int width = getWidth();
         int height = getHeight();
+        int arc = 25;
 
-        // Apply hover scale effect
+        // Hover effect for unmatched cards
         if (isHovered && !card.isMatched()) {
-            g2d.scale(1.05, 1.05);
-            width = (int) (width / 1.05);
-            height = (int) (height / 1.05);
+            width -= 4;
+            height -= 4;
+            g2d.translate(2, 2);
         }
 
-        // Draw card background
+        // Card background
         if (isFlipped || card.isMatched()) {
-            // Front side (showing animal)
-            if (card.isMatched()) {
-                g2d.setColor(new Color(254, 240, 138)); // Yellow for matched
-            } else {
-                g2d.setColor(new Color(220, 252, 231)); // Green for flipped
-            }
+            // When flipped, show animal against a colored radial gradient
+            Color animalColor = getAnimalColor();
+            Paint paint = new RadialGradientPaint(width / 2f, height / 2f, width,
+                    new float[]{0f, 1f}, new Color[]{animalColor.brighter(), animalColor.darker()});
+            g2d.setPaint(paint);
         } else {
-            // Back side (hidden)
-            g2d.setColor(new Color(192, 132, 252)); // Purple
+            // Back of the card with a cute pattern
+            g2d.setColor(UIUtils.PRIMARY_PINK);
         }
+        g2d.fillRoundRect(0, 0, width, height, arc, arc);
 
-        g2d.fillRoundRect(0, 0, width, height, 15, 15);
-
-        // Draw border
-        g2d.setStroke(new BasicStroke(3));
+        // Border
         if (card.isMatched()) {
-            g2d.setColor(new Color(250, 204, 21)); // Yellow border for matched
+            g2d.setColor(UIUtils.PRIMARY_GREEN); // Green glow for matched cards
+            g2d.setStroke(new BasicStroke(4));
         } else {
             g2d.setColor(Color.WHITE);
+            g2d.setStroke(new BasicStroke(2));
         }
-        g2d.drawRoundRect(0, 0, width - 1, height - 1, 15, 15);
+        g2d.drawRoundRect(0, 0, width - 1, height - 1, arc, arc);
 
-        // Draw content with opacity
-        Composite originalComposite = g2d.getComposite();
+        // Apply flip animation opacity
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 
+        // Content
         if (isFlipped || card.isMatched()) {
-            // Draw animal emoji
+            // Animal emoji takes center stage
             String emoji = UIUtils.getAnimalEmoji(card.getAnimal());
-            g2d.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 40)); // Support emoji rendering
+            Font emojiFont = new Font("Segoe UI Emoji", Font.PLAIN, (int) (Math.min(width, height) * 0.6));
+            g2d.setFont(emojiFont);
             FontMetrics fm = g2d.getFontMetrics();
             int x = (width - fm.stringWidth(emoji)) / 2;
-            int y = ((height - fm.getHeight()) / 2) + fm.getAscent();
+            int y = (height - fm.getHeight()) / 2 + fm.getAscent();
             g2d.drawString(emoji, x, y);
         } else {
-            // Draw question mark
+            // Cute icon for the back of the card
+            String icon = "🐾"; // Paw print
+            Font iconFont = new Font("Segoe UI Emoji", Font.PLAIN, (int) (Math.min(width, height) * 0.5));
+            g2d.setFont(iconFont);
             g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 36));
             FontMetrics fm = g2d.getFontMetrics();
-            String text = "?";
-            int x = (width - fm.stringWidth(text)) / 2;
-            int y = ((height - fm.getHeight()) / 2) + fm.getAscent();
-            g2d.drawString(text, x, y);
+            int x = (width - fm.stringWidth(icon)) / 2;
+            int y = (height - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.drawString(icon, x, y);
         }
 
-        g2d.setComposite(originalComposite);
-
-        // Draw sparkle effect for matched cards
-        if (card.isMatched()) {
-            g2d.setColor(new Color(250, 204, 21));
-            int sparkleSize = 4;
-            g2d.fillOval(width / 4, 5, sparkleSize, sparkleSize);
-            g2d.fillOval(width * 3 / 4, height - 10, sparkleSize, sparkleSize);
-            g2d.fillOval(width - 10, height / 2, sparkleSize, sparkleSize);
-        }
+        g2d.dispose();
     }
 
     public Card getCard() {

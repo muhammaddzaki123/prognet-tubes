@@ -4,20 +4,20 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UIUtils {
-    // Color palette
-    public static final Color BG_GRADIENT_START = new Color(220, 252, 231);
-    public static final Color BG_GRADIENT_END = new Color(237, 233, 254);
-    public static final Color PRIMARY_GREEN = new Color(74, 222, 128);
-    public static final Color PRIMARY_BLUE = new Color(96, 165, 250);
-    public static final Color PRIMARY_PURPLE = new Color(168, 85, 247);
-    public static final Color PRIMARY_PINK = new Color(244, 114, 182);
-    public static final Color CARD_BG = new Color(255, 255, 255, 230);
-    public static final Color TEXT_DARK = new Color(55, 65, 81);
-    public static final Color TEXT_LIGHT = new Color(107, 114, 128);
+    // Fun & Cute Color Palette
+    public static final Color BG_GRADIENT_START = new Color(255, 240, 245); // Light Pink
+    public static final Color BG_GRADIENT_END = new Color(230, 240, 255); // Light Blue
+    public static final Color PRIMARY_GREEN = new Color(29, 185, 84);   // Spotify Green
+    public static final Color PRIMARY_BLUE = new Color(0, 122, 255);    // Apple Blue
+    public static final Color PRIMARY_PURPLE = new Color(109, 40, 217); // Deep Purple
+    public static final Color PRIMARY_PINK = new Color(255, 20, 147);   // Deep Pink
+    public static final Color CARD_BG = new Color(255, 255, 255, 200); // Semi-Transparent White
+    public static final Color TEXT_DARK = new Color(40, 40, 40);
+    public static final Color TEXT_LIGHT = new Color(100, 100, 100);
 
     public static JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+        button.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 16));
         button.setForeground(Color.WHITE);
         button.setBackground(bgColor);
         button.setFocusPainted(false);
@@ -42,7 +42,7 @@ public class UIUtils {
 
     public static JButton createOutlineButton(String text, Color borderColor) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+        button.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 16));
         button.setForeground(borderColor);
         button.setBackground(Color.WHITE);
         button.setFocusPainted(false);
@@ -91,21 +91,21 @@ public class UIUtils {
 
     public static JLabel createTitleLabel(String text, Color color) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
-        label.setFont(new Font("Comic Sans MS", Font.BOLD, 48));
+        label.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 48));
         label.setForeground(color);
         return label;
     }
 
     public static JLabel createSubtitleLabel(String text) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.PLAIN, 14));
+        label.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 14));
         label.setForeground(TEXT_LIGHT);
         return label;
     }
 
     public static JTextField createStyledTextField() {
         JTextField field = new JTextField();
-        field.setFont(new Font("Arial", Font.PLAIN, 18));
+        field.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 18));
         field.setPreferredSize(new Dimension(300, 40));
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(PRIMARY_BLUE, 2),
