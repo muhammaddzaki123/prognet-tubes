@@ -1,0 +1,192 @@
+/* Root Container with Gradient Background */
+.root-container {
+    -fx-background-color: linear-gradient(to bottom right, #97ffcaff, rgb(166, 245, 255), #bcadffff);
+    -fx-padding: 50;
+}
+
+/* Main Content Card */
+.content-card {
+    -fx-background-color: #ebebebff;
+    -fx-background-radius: 20;
+    -fx-padding: 30 40 40 40;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 5);
+}
+
+/* Green Section (Room Code, Player 1) */
+.green-section {
+    -fx-background-color: #d4f4e8ff;
+    -fx-background-radius: 15;
+    -fx-padding: 25 30 25 30;
+    -fx-border-color: #10B981;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* Blue Section (Player 2) */
+.blue-section {
+    -fx-background-color: #dbe9ffff;
+    -fx-background-radius: 15;
+    -fx-padding: 20 25 20 25;
+    -fx-border-color: #3B82F6;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* Title Styles */
+.title-green {
+    -fx-font-size: 36;
+    -fx-font-weight: bold;
+    -fx-text-fill: #10B981;
+    -fx-font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+}
+
+.title-blue {
+    -fx-font-size: 36;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3B82F6;
+    -fx-font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+}
+
+.title-purple {
+    -fx-font-size: 36;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B5CF6;
+    -fx-font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+}
+
+/* Button Styles */
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666666;
+    -fx-font-size: 16;
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 15;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8;
+}
+
+.btn-settings {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666666;
+    -fx-font-size: 20;
+    -fx-cursor: hand;
+    -fx-padding: 5 10 5 10;
+}
+
+.btn-copy {
+    -fx-background-color: white;
+    -fx-text-fill: #666666;
+    -fx-font-size: 14;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 10 30 10 30;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.btn-start-game {
+    -fx-background-color: linear-gradient(to right, #8B5CF6, #EC4899);
+    -fx-text-fill: white;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-padding: 18 40 18 40;
+}
+
+.btn-green {
+    -fx-background-color: #10B981;
+    -fx-text-fill: white;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-padding: 15 40 15 40;
+}
+
+.btn-blue {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: white;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-padding: 15 40 15 40;
+}
+
+.btn-purple-outline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8B5CF6;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-border-color: #8B5CF6;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-padding: 15 40 15 40;
+}
+
+/* Room Code Digit */
+.room-code-digit {
+    -fx-background-color: white;
+    -fx-text-fill: #10B981;
+    -fx-font-size: 28;
+    -fx-font-weight: bold;
+    -fx-padding: 15 20 15 20;
+    -fx-background-radius: 10;
+    -fx-min-width: 50;
+    -fx-alignment: center;
+}
+
+/* Avatar Circles */
+.avatar-green {
+    -fx-fill: #10B981;
+}
+
+.avatar-blue {
+    -fx-fill: #3B82F6;
+}
+
+/* Status Indicators */
+.status-green {
+    -fx-fill: #10B981;
+}
+
+.status-blue {
+    -fx-fill: #3B82F6;
+}
+
+/* Text Styles */
+.label-secondary {
+    -fx-font-size: 14;
+    -fx-text-fill: #666666;
+}
+
+.label-player-name {
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.label-status-green {
+    -fx-font-size: 12;
+    -fx-text-fill: #10B981;
+}
+
+.label-status-blue {
+    -fx-font-size: 12;
+    -fx-text-fill: #3B82F6;
+}
+
+/* Decorative Animals */
+.decorative-animal {
+    -fx-font-size: 60;
+    -fx-opacity: 0.7;
+}
+
+.decorative-animal-small {
+    -fx-font-size: 55;
+    -fx-opacity: 0.7;
+}

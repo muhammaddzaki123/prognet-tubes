@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prognet.baseScript">
+    <!-- Top Left - Tiger -->
+    <Label fx:id="topLeftAnimal" text="🐯" styleClass="decorative-animal" StackPane.alignment="TOP_LEFT">
+        <StackPane.margin>
+            <Insets top="20" left="20" />
+        </StackPane.margin>
+    </Label>
+
+    <!-- Top Right - Bird -->
+    <Label fx:id="topRightAnimal" text="🦦" styleClass="decorative-animal" StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets top="20" right="20" />
+        </StackPane.margin>
+    </Label>
+
+    <!-- Bottom Left - Sloth -->
+    <Label fx:id="bottomLeftAnimal" text="🦥" styleClass="decorative-animal-small" StackPane.alignment="BOTTOM_LEFT">
+        <StackPane.margin>
+            <Insets bottom="20" left="30" />
+        </StackPane.margin>
+    </Label>
+
+    <!-- Bottom Right - Lemur/Monkey -->
+    <Label fx:id="bottomRightAnimal" text="🐵" styleClass="decorative-animal-small" StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin>
+            <Insets bottom="20" right="30" />
+        </StackPane.margin>
+    </Label>
+</StackPane>

@@ -10,48 +10,13 @@
 <?import javafx.scene.image.Image?>
 
 <StackPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="prognet.HomeController" style="
-        -fx-background-color: linear-gradient(to bottom right, #97ffcaff, #a6ccffff, #bcadffff    ); 
-        -fx-padding: 50;
-    ">
+    fx:controller="prognet.HomeController" styleClass="root-container" stylesheets="@styles.css">
     <children>
-        <!-- Decorative Animals -->
-        <!-- Top Left - Tiger -->
-        <Label fx:id="topLeftAnimal" text="🐯" style="-fx-font-size: 60; -fx-opacity: 0.7;"
-            StackPane.alignment="TOP_LEFT">
-            <StackPane.margin>
-                <Insets top="20" left="20" />
-            </StackPane.margin>
-        </Label>
-
-        <!-- Top Right - Bird -->
-        <Label fx:id="topRightAnimal" text="🦜" style="-fx-font-size: 60; -fx-opacity: 0.7;"
-            StackPane.alignment="TOP_RIGHT">
-            <StackPane.margin>
-                <Insets top="20" right="20" />
-            </StackPane.margin>
-        </Label>
-
-        <!-- Bottom Left - Sloth -->
-        <Label fx:id="bottomLeftAnimal" text="🦥" style="-fx-font-size: 55; -fx-opacity: 0.7;"
-            StackPane.alignment="BOTTOM_LEFT">
-            <StackPane.margin>
-                <Insets bottom="20" left="30" />
-            </StackPane.margin>
-        </Label>
-
-        <!-- Bottom Right - Lemur/Monkey -->
-        <Label fx:id="bottomRightAnimal" text="🐵" style="-fx-font-size: 55; -fx-opacity: 0.7;"
-            StackPane.alignment="BOTTOM_RIGHT">
-            <StackPane.margin>
-                <Insets bottom="20" right="30" />
-            </StackPane.margin>
-        </Label>
+        <!-- Include Decorative Animals -->
+        <fx:include source="base.fxml" />
 
         <!-- Main Content -->
-        <VBox alignment="CENTER" spacing="20.0"
-            style="-fx-background-color: #ebebebff; -fx-background-radius: 20; -fx-padding: 50 40 50 40; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);"
-            maxWidth="400" maxHeight="550">
+        <VBox alignment="CENTER" spacing="20.0" styleClass="content-card" maxWidth="600" maxHeight="550">
             <children>
                 <!-- Icon -->
                 <Label text="🎮"
@@ -62,33 +27,30 @@
                 </Label>
 
                 <!-- Title -->
-                <Label text="Memory Game"
-                    style="-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #8B5CF6; -fx-font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;">
+                <Label text="Memory Game" styleClass="title-purple">
                     <VBox.margin>
                         <Insets bottom="5" />
                     </VBox.margin>
                 </Label>
 
                 <!-- Subtitle -->
-                <Label text="Match the animals and have fun!" style="-fx-font-size: 14; -fx-text-fill: #666666;">
+                <Label text="Match the animals and have fun!" styleClass="label-secondary">
                     <VBox.margin>
                         <Insets bottom="30" />
                     </VBox.margin>
                 </Label>
 
                 <!-- Create Room Button -->
-                <Button fx:id="createRoomBtn" text="👥  Create Room" onAction="#onCreateRoom"
-                    style="-fx-background-color: #10B981; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 12; -fx-cursor: hand; -fx-padding: 15 40 15 40;"
-                    prefWidth="280" maxWidth="280">
+                <Button fx:id="createRoomBtn" text="👥  Create Room" onAction="#onCreateRoom" styleClass="btn-green"
+                    prefWidth="280" maxWidth="480">
                     <VBox.margin>
                         <Insets bottom="10" />
                     </VBox.margin>
                 </Button>
 
                 <!-- Join Room Button -->
-                <Button fx:id="joinRoomBtn" text="🚪  Join Room" onAction="#onJoinRoom"
-                    style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 12; -fx-cursor: hand; -fx-padding: 15 40 15 40;"
-                    prefWidth="280" maxWidth="280">
+                <Button fx:id="joinRoomBtn" text="🚺  Join Room" onAction="#onJoinRoom" styleClass="btn-blue"
+                    prefWidth="280" maxWidth="480">
                     <VBox.margin>
                         <Insets bottom="10" />
                     </VBox.margin>
@@ -96,8 +58,7 @@
 
                 <!-- How to Play Button -->
                 <Button fx:id="howToPlayBtn" text="❓  How to Play" onAction="#onHowToPlay"
-                    style="-fx-background-color: transparent; -fx-text-fill: #8B5CF6; -fx-font-size: 16; -fx-font-weight: bold; -fx-border-color: #8B5CF6; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-padding: 15 40 15 40;"
-                    prefWidth="280" maxWidth="280">
+                    styleClass="btn-purple-outline" prefWidth="280" maxWidth="480">
                     <VBox.margin>
                         <Insets bottom="20" />
                     </VBox.margin>

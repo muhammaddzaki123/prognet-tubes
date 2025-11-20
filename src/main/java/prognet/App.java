@@ -17,7 +17,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("home"), 500, 700);
+        scene = new Scene(loadFXML("home"), 650, 700);
         stage.setMaximized(true);
         stage.setScene(scene);
         stage.setTitle("Memory Game");
