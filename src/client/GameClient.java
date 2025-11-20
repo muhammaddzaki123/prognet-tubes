@@ -2,7 +2,7 @@ package client;
 
 import common.*;
 import com.google.gson.JsonObject;
-import javax.swing.SwingUtilities;
+import javafx.application.Platform;
 import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -71,7 +71,7 @@ public class GameClient {
                 String line;
                 while (connected && (line = in.readLine()) != null) {
                     final String finalLine = line;
-                    SwingUtilities.invokeLater(() -> {
+                    Platform.runLater(() -> {
                         try {
                             Message message = Message.fromJson(finalLine);
                             LOGGER.info("Received: " + message.getType());
@@ -86,7 +86,7 @@ public class GameClient {
             } catch (IOException e) {
                 if (connected) {
                     LOGGER.warning("Connection lost: " + e.getMessage());
-                    SwingUtilities.invokeLater(() -> {
+                    Platform.runLater(() -> {
                         disconnect();
                         if (messageHandler != null) {
                             JsonObject data = new JsonObject();

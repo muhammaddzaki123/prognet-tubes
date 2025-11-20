@@ -22,3 +22,5 @@ Thumbs.db
 # Temp files
 *.tmp
 *.bak
+javafx-sdk.zip
+lib/javafx-sdk-21.0.2/
