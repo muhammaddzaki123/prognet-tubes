@@ -1,5 +1,5 @@
 import server.GameServer;
-import client.gui.MainFrame;
+import client.gui.javafx.ClientApp;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +18,7 @@ public class Main {
         } else {
             // Start client
             System.out.println("Starting Memory Game Client...");
-            MainFrame.main(args);
+            ClientApp.main(args);
         }
     }
 }
