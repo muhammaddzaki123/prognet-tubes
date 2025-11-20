@@ -6,7 +6,9 @@ module prognet {
     requires com.google.gson;
 
     opens prognet to javafx.fxml;
+    opens prognet.controller to javafx.fxml;
+
     exports prognet;
-    exports prognet.client;
+    exports prognet.network.client;
     exports prognet.common;
 }

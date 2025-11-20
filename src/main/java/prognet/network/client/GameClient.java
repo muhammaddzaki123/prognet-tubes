@@ -1,4 +1,4 @@
-package prognet.client;
+package prognet.network.client;
 
 import prognet.common.*;
 import com.google.gson.JsonObject;

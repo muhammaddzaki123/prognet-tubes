@@ -1,4 +1,4 @@
-package prognet;
+package prognet.controller;
 
 import java.io.IOException;
 import java.util.Random;
@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.StackPane;
+import prognet.App;
+import prognet.util.SettingsOverlay;
 
 public class CreateRoomController {
 
@@ -114,7 +116,7 @@ public class CreateRoomController {
 
     @FXML
     private void onSettings() {
-        SettingsDialog.show(rootContainer);
+        SettingsOverlay.show(rootContainer);
     }
 
     @FXML

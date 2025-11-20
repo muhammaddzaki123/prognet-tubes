@@ -1,4 +1,4 @@
-package prognet;
+package prognet.controller;
 
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
-public class baseScript {
+public class BaseController {
 
     @FXML
     private Label topLeftAnimal;

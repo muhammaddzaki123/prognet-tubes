@@ -1,4 +1,4 @@
-package prognet;
+package prognet.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

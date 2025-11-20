@@ -1,4 +1,4 @@
-package prognet.server;
+package prognet.network.server;
 
 import prognet.common.*;
 import java.util.*;

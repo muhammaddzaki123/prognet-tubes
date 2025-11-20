@@ -1,10 +1,11 @@
-package prognet;
+package prognet.controller;
 
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import prognet.App;
 import javafx.scene.control.Button;
 
 public class HomeController {

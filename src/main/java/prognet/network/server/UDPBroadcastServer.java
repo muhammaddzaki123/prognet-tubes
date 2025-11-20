@@ -1,4 +1,4 @@
-package prognet.server;
+package prognet.network.server;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

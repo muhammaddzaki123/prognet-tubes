@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 
 <StackPane fx:id="rootContainer" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="prognet.CreateRoomController" styleClass="root-container" stylesheets="@styles.css">
+    fx:controller="prognet.controller.CreateRoomController" styleClass="root-container" stylesheets="@styles.css">
     <children>
         <!-- Include Decorative Animals -->
         <fx:include source="base.fxml" />

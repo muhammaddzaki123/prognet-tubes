@@ -10,7 +10,7 @@
 <?import javafx.scene.shape.Line?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="prognet.SettingsController" spacing="20" styleClass="content-card" stylesheets="@styles.css"
+    fx:controller="prognet.controller.SettingsController" spacing="20" styleClass="content-card" stylesheets="@styles.css"
     maxWidth="450" maxHeight="0">
 
     <!-- Header -->

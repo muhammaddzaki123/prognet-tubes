@@ -1,4 +1,4 @@
-package prognet.server;
+package prognet.network.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

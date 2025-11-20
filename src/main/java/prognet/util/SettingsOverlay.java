@@ -1,4 +1,4 @@
-package prognet;
+package prognet.util;
 
 import java.io.IOException;
 
@@ -7,8 +7,9 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import prognet.controller.SettingsController;
 
-public class SettingsDialog {
+public class SettingsOverlay {
 
     public static void show(StackPane rootContainer) {
         try {
@@ -19,7 +20,7 @@ public class SettingsDialog {
             overlay.heightProperty().bind(rootContainer.heightProperty());
 
             // Load settings FXML
-            FXMLLoader loader = new FXMLLoader(SettingsDialog.class.getResource("settings.fxml"));
+            FXMLLoader loader = new FXMLLoader(SettingsOverlay.class.getResource("/prognet/settings.fxml"));
             Parent settingsContent = loader.load();
 
             // Get controller and set close handler
