@@ -5,8 +5,8 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import prognet.App;
 import javafx.scene.control.Button;
+import prognet.App;
 
 public class HomeController {
 
@@ -88,8 +88,4 @@ public class HomeController {
         alert.showAndWait();
     }
 
-    @FXML
-    private void switchToSecondary() throws IOException {
-        App.setRoot("secondary");
-    }
 }
