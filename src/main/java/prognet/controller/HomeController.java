@@ -65,8 +65,8 @@ public class HomeController {
     }
 
     @FXML
-    private void onJoinRoom() {
-        showAlert("Join Room", "Joining a room...\nThis feature will be implemented soon!");
+    private void onJoinRoom() throws IOException {
+        App.setRoot("joinroom");
     }
 
     @FXML

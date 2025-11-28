@@ -7,7 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import prognet.controller.HomeController;
 
 /**
  * JavaFX App
@@ -26,13 +25,6 @@ public class App extends Application {
         stage.centerOnScreen();
         stage.show();
 
-        // Shutdown hook for clean disconnect
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("App: Shutting down, disconnecting from server...");
-            if (HomeController.getGameClient() != null) {
-                HomeController.getGameClient().disconnect();
-            }
-        }));
     }
 
     static public void setRoot(String fxml) throws IOException {

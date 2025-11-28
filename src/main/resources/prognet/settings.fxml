@@ -2,90 +2,96 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.shape.Line?>
+<?import javafx.scene.layout.ColumnConstraints?>
 
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="prognet.controller.SettingsController" spacing="20" styleClass="content-card" stylesheets="@styles.css"
-    maxWidth="450" maxHeight="0">
+    fx:controller="prognet.controller.SettingsController" spacing="20" styleClass="content-card"
+    stylesheets="@styles.css" maxWidth="450" prefWidth="400"
+    style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.3), 20, 0, 0, 5);">
+
+    <padding>
+        <Insets top="25" right="30" bottom="25" left="30" />
+    </padding>
 
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <children>
-            <Label text="⚙" style="-fx-font-size: 32;" />
-            <Label text="Settings" styleClass="title-purple">
-                <style>
-                    -fx-font-size: 28;
-                </style>
-            </Label>
-        </children>
-    </HBox>
-
-    <!-- Divider -->
-    <Line endX="370" style="-fx-stroke: #cccccc;" />
-
-    <!-- Sound Effects -->
-    <VBox spacing="10">
-        <children>
-            <Label text="🔊 Sound Effects" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <children>
-                    <Label text="Volume" styleClass="label-secondary" />
-                    <Slider fx:id="soundVolumeSlider" min="0" max="100" value="70" prefWidth="200" showTickMarks="false"
-                        showTickLabels="false" />
-                    <Label fx:id="soundVolumeLabel" text="70%" styleClass="label-secondary"
-                        style="-fx-min-width: 40; -fx-alignment: center-right;" />
-                </children>
-            </HBox>
-            <CheckBox fx:id="soundEffectsCheckBox" text="Enable sound effects" selected="true"
-                style="-fx-font-size: 14; -fx-text-fill: #666666;" />
-        </children>
-    </VBox>
-
-    <!-- Background Music -->
-    <VBox spacing="10">
-        <children>
-            <Label text="🎵 Background Music"
-                style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <children>
-                    <Label text="Volume" styleClass="label-secondary" />
-                    <Slider fx:id="musicVolumeSlider" min="0" max="100" value="50" prefWidth="200" showTickMarks="false"
-                        showTickLabels="false" />
-                    <Label fx:id="musicVolumeLabel" text="50%" styleClass="label-secondary"
-                        style="-fx-min-width: 40; -fx-alignment: center-right;" />
-                </children>
-            </HBox>
-            <CheckBox fx:id="backgroundMusicCheckBox" text="Enable background music" selected="true"
-                style="-fx-font-size: 14; -fx-text-fill: #666666;" />
-        </children>
-    </VBox>
-
-    <!-- Animations -->
-    <VBox spacing="10">
-        <children>
-            <Label text="✨ Animations" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333333;" />
-            <CheckBox fx:id="animationsCheckBox" text="Enable animations" selected="true"
-                style="-fx-font-size: 14; -fx-text-fill: #666666;" />
-        </children>
-    </VBox>
-
-    <!-- Divider -->
-    <Line endX="370" style="-fx-stroke: #cccccc;" />
-
-    <!-- Buttons -->
-    <HBox alignment="CENTER" spacing="15">
-        <children>
-            <Button fx:id="saveBtn" text="💾 Save" onAction="#onSave" styleClass="btn-green" prefWidth="150" />
-            <Button fx:id="cancelBtn" text="✖ Cancel" onAction="#onCancel" styleClass="btn-purple-outline"
-                prefWidth="150" />
-        </children>
+    <Label text="Game Settings" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #8B5CF6;">
         <VBox.margin>
-            <Insets top="10" />
+            <Insets bottom="10" />
         </VBox.margin>
-    </HBox>
+    </Label>
+
+    <!-- Grid Size -->
+    <VBox spacing="12">
+        <children>
+            <Label text="Grid Size" style="-fx-font-size: 14; -fx-text-fill: #666666;" />
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <children>
+                    <Button fx:id="gridSize3x3Btn" text="3x3" onAction="#onSelectGridSize3x3"
+                        styleClass="setting-option-btn" prefWidth="90" prefHeight="40" />
+                    <Button fx:id="gridSize4x4Btn" text="4x4" onAction="#onSelectGridSize4x4"
+                        styleClass="setting-option-btn-selected" prefWidth="90" prefHeight="40" />
+                    <Button fx:id="gridSize5x5Btn" text="5x5" onAction="#onSelectGridSize5x5"
+                        styleClass="setting-option-btn" prefWidth="90" prefHeight="40" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <!-- Theme -->
+    <VBox spacing="12">
+        <children>
+            <Label text="Theme" style="-fx-font-size: 14; -fx-text-fill: #666666;" />
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50" />
+                    <ColumnConstraints percentWidth="50" />
+                </columnConstraints>
+                <children>
+                    <Button fx:id="themeJungleBtn" text="Jungle" onAction="#onSelectThemeJungle"
+                        styleClass="setting-option-btn-selected" prefWidth="140" prefHeight="40"
+                        GridPane.columnIndex="0" GridPane.rowIndex="0" maxWidth="Infinity" />
+                    <Button fx:id="themeForestBtn" text="Forest" onAction="#onSelectThemeForest"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="1"
+                        GridPane.rowIndex="0" maxWidth="Infinity" />
+                    <Button fx:id="themeSavannaBtn" text="Savanna" onAction="#onSelectThemeSavanna"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="0"
+                        GridPane.rowIndex="1" maxWidth="Infinity" />
+                    <Button fx:id="themeOceanBtn" text="Ocean" onAction="#onSelectThemeOcean"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="1"
+                        GridPane.rowIndex="1" maxWidth="Infinity" />
+                </children>
+            </GridPane>
+        </children>
+    </VBox>
+
+    <!-- Card Back Pattern -->
+    <VBox spacing="12">
+        <children>
+            <Label text="Card Back Pattern" style="-fx-font-size: 14; -fx-text-fill: #666666;" />
+            <GridPane hgap="10" vgap="10">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50" />
+                    <ColumnConstraints percentWidth="50" />
+                </columnConstraints>
+                <children>
+                    <Button fx:id="patternPawsBtn" text="Paws" onAction="#onSelectPatternPaws"
+                        styleClass="setting-option-btn-selected" prefWidth="140" prefHeight="40"
+                        GridPane.columnIndex="0" GridPane.rowIndex="0" maxWidth="Infinity" />
+                    <Button fx:id="patternLeavesBtn" text="Leaves" onAction="#onSelectPatternLeaves"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="1"
+                        GridPane.rowIndex="0" maxWidth="Infinity" />
+                    <Button fx:id="patternStripesBtn" text="Stripes" onAction="#onSelectPatternStripes"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="0"
+                        GridPane.rowIndex="1" maxWidth="Infinity" />
+                    <Button fx:id="patternGeometricBtn" text="Geometric" onAction="#onSelectPatternGeometric"
+                        styleClass="setting-option-btn" prefWidth="140" prefHeight="40" GridPane.columnIndex="1"
+                        GridPane.rowIndex="1" maxWidth="Infinity" />
+                </children>
+            </GridPane>
+        </children>
+    </VBox>
 </VBox>
