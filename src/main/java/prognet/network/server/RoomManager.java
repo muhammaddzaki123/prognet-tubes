@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class RoomManager {
+
     private static final Logger LOGGER = Logger.getLogger(RoomManager.class.getName());
     private Map<String, Room> rooms;
     private Random random;
@@ -17,9 +18,11 @@ public class RoomManager {
 
     public synchronized String createRoom(String gridSize, String theme) {
         String roomCode = generateRoomCode();
+        System.out.println("RoomManager: Generating room with code " + roomCode);
         Room room = new Room(roomCode, gridSize, theme);
         rooms.put(roomCode, room);
         LOGGER.info("Room created: " + roomCode);
+        System.out.println("RoomManager: Room added to map, total rooms: " + rooms.size());
         return roomCode;
     }
 

@@ -1,18 +1,25 @@
 package prognet.network.client;
 
-import prognet.common.*;
-import com.google.gson.JsonObject;
-import javax.swing.SwingUtilities;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import com.google.gson.JsonObject;
+
+import javafx.application.Platform;
+import prognet.common.Message;
+import prognet.common.MessageType;
+import prognet.util.NetworkConfig;
+
 public class GameClient {
+
     private static final Logger LOGGER = Logger.getLogger(GameClient.class.getName());
-    private static final int PORT = 5000;
 
     private Socket socket;
     private BufferedReader in;
@@ -20,10 +27,11 @@ public class GameClient {
     private Consumer<Message> messageHandler;
     private boolean connected;
     private String serverIP;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService;
 
     public GameClient() {
         this.connected = false;
+        this.executorService = Executors.newSingleThreadExecutor();
     }
 
     public String getServerIP() {
@@ -32,8 +40,16 @@ public class GameClient {
 
     public boolean connect(String serverIP) {
         this.serverIP = serverIP;
+        int port = NetworkConfig.getInstance().getServerPort();
+
+        // Recreate executor if it was shutdown
+        if (executorService == null || executorService.isShutdown()) {
+            executorService = Executors.newSingleThreadExecutor();
+            System.out.println("Created new ExecutorService");
+        }
+
         try {
-            socket = new Socket(serverIP, PORT);
+            socket = new Socket(serverIP, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
             connected = true;
@@ -51,12 +67,13 @@ public class GameClient {
     }
 
     public boolean autoConnect() {
-        // Try localhost first
-        if (connect("localhost")) {
+        // Try configured host first
+        String configuredHost = NetworkConfig.getInstance().getServerHost();
+        if (connect(configuredHost)) {
             return true;
         }
 
-        // Try UDP discovery
+        // Try UDP discovery if configured host fails
         String discoveredIP = UDPDiscoveryClient.discoverServer();
         if (discoveredIP != null) {
             return connect(discoveredIP);
@@ -71,7 +88,7 @@ public class GameClient {
                 String line;
                 while (connected && (line = in.readLine()) != null) {
                     final String finalLine = line;
-                    SwingUtilities.invokeLater(() -> {
+                    Platform.runLater(() -> {
                         try {
                             Message message = Message.fromJson(finalLine);
                             LOGGER.info("Received: " + message.getType());
@@ -86,7 +103,7 @@ public class GameClient {
             } catch (IOException e) {
                 if (connected) {
                     LOGGER.warning("Connection lost: " + e.getMessage());
-                    SwingUtilities.invokeLater(() -> {
+                    Platform.runLater(() -> {
                         disconnect();
                         if (messageHandler != null) {
                             JsonObject data = new JsonObject();
@@ -106,11 +123,17 @@ public class GameClient {
     }
 
     public void sendMessage(Message message) {
+        System.out.println("GameClient.sendMessage called for: " + message.getType());
+        System.out.println("  connected=" + connected + ", out=" + (out != null) + ", executorShutdown=" + executorService.isShutdown());
+
         if (connected && out != null && !executorService.isShutdown()) {
             executorService.submit(() -> {
                 out.println(message.toJson());
                 LOGGER.info("Sent: " + message.getType());
+                System.out.println("Message sent: " + message.getType());
             });
+        } else {
+            System.out.println("WARNING: Message not sent! connected=" + connected + ", out=" + (out != null) + ", executorShutdown=" + executorService.isShutdown());
         }
     }
 
@@ -123,10 +146,13 @@ public class GameClient {
     }
 
     public void joinRoom(String playerName, String roomCode) {
+        System.out.println("GameClient.joinRoom called: playerName=" + playerName + ", roomCode=" + roomCode);
         JsonObject data = new JsonObject();
         data.addProperty("playerName", playerName);
         data.addProperty("roomCode", roomCode);
-        sendMessage(new Message(MessageType.JOIN_ROOM, data));
+        Message message = new Message(MessageType.JOIN_ROOM, data);
+        System.out.println("Created JOIN_ROOM message: " + message.toJson());
+        sendMessage(message);
     }
 
     public void startGame() {
@@ -156,9 +182,15 @@ public class GameClient {
             connected = false;
             executorService.shutdown();
             try {
-                if (in != null) in.close();
-                if (out != null) out.close();
-                if (socket != null) socket.close();
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+                if (socket != null) {
+                    socket.close();
+                }
                 LOGGER.info("Disconnected from server");
             } catch (IOException e) {
                 LOGGER.warning("Error closing resources during disconnect: " + e.getMessage());

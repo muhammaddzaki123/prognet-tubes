@@ -2,14 +2,21 @@ package prognet.controller;
 
 import java.io.IOException;
 
+import com.google.gson.Gson;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import prognet.App;
+import prognet.common.GameState;
+import prognet.common.Message;
+import prognet.network.client.NetworkManager;
 
 public class WaitingRoomController implements App.DataReceiver {
 
@@ -42,14 +49,21 @@ public class WaitingRoomController implements App.DataReceiver {
 
     private String roomCode;
     private Timeline dotsAnimation;
+    private NetworkManager networkManager;
+    private final Gson gson = new Gson();
 
     @FXML
     public void initialize() {
+        networkManager = NetworkManager.getInstance();
+
         // Setup button hover effects
         setupButtonHover(backBtn);
 
         // Start animated dots
         startDotsAnimation();
+
+        // Setup network message handler
+        setupNetworkHandlers();
     }
 
     @Override
@@ -107,14 +121,72 @@ public class WaitingRoomController implements App.DataReceiver {
             dotsAnimation.stop();
         }
 
-        // TODO: Disconnect from server/room
-        System.out.println("Leaving room: " + roomCode);
+        // Disconnect from server
+        if (networkManager != null && networkManager.isConnected()) {
+            networkManager.disconnect();
+        }
 
         try {
             App.setRoot("home");
         } catch (IOException e) {
-            e.printStackTrace();
+            showError("Navigation Error", "Failed to return to home screen");
         }
+    }
+
+    private void setupNetworkHandlers() {
+        networkManager.setMessageHandler(message -> {
+            handleNetworkMessage(message);
+        });
+    }
+
+    private void handleNetworkMessage(Message message) {
+        switch (message.getType()) {
+            case GAME_STARTED:
+                handleGameStarted(message);
+                break;
+            case PLAYER_LEFT:
+                handlePlayerLeft(message);
+                break;
+            case ERROR:
+                handleError(message);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void handleGameStarted(Message message) {
+        GameState gameState = gson.fromJson(message.getData().get("gameState"), GameState.class);
+
+        Platform.runLater(() -> {
+            cleanup();
+            try {
+                App.setRoot("gameboard", gameState);
+            } catch (IOException e) {
+                showError("Navigation Error", "Failed to start game");
+            }
+        });
+    }
+
+    private void handlePlayerLeft(Message message) {
+        Platform.runLater(() -> {
+            showError("Player Left", "The other player has left the room");
+        });
+    }
+
+    private void handleError(Message message) {
+        String errorMessage = message.getData().get("message").getAsString();
+        Platform.runLater(() -> {
+            showError("Error", errorMessage);
+        });
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void cleanup() {

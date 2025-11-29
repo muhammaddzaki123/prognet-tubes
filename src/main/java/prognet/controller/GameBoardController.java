@@ -1,19 +1,20 @@
 package prognet.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import prognet.App;
 import prognet.common.Card;
+import prognet.common.GameState;
+import prognet.common.Message;
+import prognet.network.client.NetworkManager;
 
 public class GameBoardController implements App.DataReceiver {
 
@@ -59,80 +60,104 @@ public class GameBoardController implements App.DataReceiver {
     @FXML
     private GridPane cardGrid;
 
-    // Game state
-    private String roomCode;
-    private int gridSize = 4; // Default 4x4
-    private int player1Score = 0;
-    private int player2Score = 0;
-    private int currentPlayer = 1;
-    private List<Card> cards;
-    private Button[][] cardButtons;
-    private Card firstFlippedCard = null;
-    private Card secondFlippedCard = null;
-    private boolean canFlip = true;
+    // Game state from server
+    private GameState gameState;
+    private NetworkManager networkManager;
 
-    // Animal emojis for the cards
-    private static final String[] ANIMALS = {
-        "🦁", "🐯", "🐘", "🦒", "🦓", "🦏", "🐊", "🦜",
-        "🐍", "🦘", "🦎", "🦢", "🦩", "🦫", "🦦", "🦥"
-    };
+    private Button[][] cardButtons;
+    private final Map<Integer, Button> cardButtonMap = new HashMap<>();
 
     @FXML
     public void initialize() {
+        networkManager = NetworkManager.getInstance();
         setupButtonHover(leaveBtn);
-        initializeGame();
+
+        // Setup network message handler
+        setupNetworkHandlers();
     }
 
     @Override
     public void receiveData(Object data) {
-        if (data instanceof String) {
-            this.roomCode = (String) data;
+        if (data instanceof GameState state) {
+            this.gameState = state;
+            initializeGameFromState();
+        } else if (data instanceof String roomCode) {
+            // Legacy support if only room code is passed
             roomCodeLabel.setText(roomCode);
         }
     }
 
-    private void initializeGame() {
-        // Create cards
-        createCards();
-
-        // Setup grid
-        setupGameBoard();
-
-        // Update UI
-        updateTurnIndicator();
-    }
-
-    private void createCards() {
-        cards = new ArrayList<>();
-        int totalCards = gridSize * gridSize;
-        int pairs = totalCards / 2;
-
-        // Create pairs of cards
-        for (int i = 0; i < pairs; i++) {
-            String animal = ANIMALS[i % ANIMALS.length];
-            cards.add(new Card(i * 2, animal));
-            cards.add(new Card(i * 2 + 1, animal));
+    private void initializeGameFromState() {
+        if (gameState == null) {
+            return;
         }
 
-        // Shuffle cards
-        Collections.shuffle(cards);
+        // Update UI with game state
+        roomCodeLabel.setText(gameState.getRoomCode());
+        player1NameLabel.setText(gameState.getPlayer1Name());
+        player2NameLabel.setText(gameState.getPlayer2Name());
+
+        // Setup game board
+        setupGameBoard();
+
+        // Update scores and turn
+        updateScores();
+        updateTurnIndicator();
     }
 
     private void setupGameBoard() {
         cardGrid.getChildren().clear();
+        cardButtonMap.clear();
+
+        int gridSize = getGridSize();
         cardButtons = new Button[gridSize][gridSize];
 
         int cardIndex = 0;
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
-                final Card card = cards.get(cardIndex);
-                final int currentIndex = cardIndex;
+                if (cardIndex >= gameState.getCards().size()) {
+                    break;
+                }
+
+                final Card card = gameState.getCards().get(cardIndex);
 
                 // Create card button
-                Button cardButton = new Button("?");
-                cardButton.setPrefSize(100, 100);
-                cardButton.setMaxSize(100, 100);
-                cardButton.setMinSize(100, 100);
+                Button cardButton = createCardButton(card);
+
+                cardButtons[row][col] = cardButton;
+                cardButtonMap.put(card.getId(), cardButton);
+                cardGrid.add(cardButton, col, row);
+                cardIndex++;
+            }
+        }
+    }
+
+    private Button createCardButton(Card card) {
+        Button cardButton = new Button();
+        updateCardButtonAppearance(cardButton, card);
+
+        cardButton.setPrefSize(100, 100);
+        cardButton.setMaxSize(100, 100);
+        cardButton.setMinSize(100, 100);
+
+        // Add hover effect
+        cardButton.setOnMouseEntered(e -> {
+            if (!card.isFlipped() && !card.isMatched() && isMyTurn()) {
+                cardButton.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom right, #D946EF, #A855F7);"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 40;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-background-radius: 12;"
+                        + "-fx-cursor: hand;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);"
+                        + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;"
+                );
+            }
+        });
+
+        cardButton.setOnMouseExited(e -> {
+            if (!card.isFlipped() && !card.isMatched()) {
                 cardButton.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
                         + "-fx-text-fill: white;"
@@ -142,123 +167,18 @@ public class GameBoardController implements App.DataReceiver {
                         + "-fx-cursor: hand;"
                         + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"
                 );
-
-                // Add hover effect
-                cardButton.setOnMouseEntered(e -> {
-                    if (!card.isFlipped() && !card.isMatched() && canFlip) {
-                        cardButton.setStyle(
-                                "-fx-background-color: linear-gradient(to bottom right, #D946EF, #A855F7);"
-                                + "-fx-text-fill: white;"
-                                + "-fx-font-size: 40;"
-                                + "-fx-font-weight: bold;"
-                                + "-fx-background-radius: 12;"
-                                + "-fx-cursor: hand;"
-                                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);"
-                                + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;"
-                        );
-                    }
-                });
-
-                cardButton.setOnMouseExited(e -> {
-                    if (!card.isFlipped() && !card.isMatched()) {
-                        cardButton.setStyle(
-                                "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
-                                + "-fx-text-fill: white;"
-                                + "-fx-font-size: 40;"
-                                + "-fx-font-weight: bold;"
-                                + "-fx-background-radius: 12;"
-                                + "-fx-cursor: hand;"
-                                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"
-                        );
-                    }
-                });
-
-                // Add click handler
-                cardButton.setOnAction(e -> handleCardClick(card, cardButton));
-
-                cardButtons[row][col] = cardButton;
-                cardGrid.add(cardButton, col, row);
-                cardIndex++;
             }
-        }
+        });
+
+        // Add click handler
+        cardButton.setOnAction(e -> handleCardClick(card));
+
+        return cardButton;
     }
 
-    private void handleCardClick(Card card, Button button) {
-        if (!canFlip || card.isFlipped() || card.isMatched()) {
-            return;
-        }
-
-        // Flip the card
-        card.setFlipped(true);
-        button.setText(card.getAnimal());
-        button.setStyle(
-                "-fx-background-color: white;"
-                + "-fx-text-fill: #333333;"
-                + "-fx-font-size: 40;"
-                + "-fx-background-radius: 12;"
-                + "-fx-border-color: #E879F9;"
-                + "-fx-border-width: 3;"
-                + "-fx-border-radius: 12;"
-                + "-fx-effect: dropshadow(gaussian, rgba(232, 121, 249, 0.4), 12, 0, 0, 4);"
-        );
-
-        if (firstFlippedCard == null) {
-            // First card flipped
-            firstFlippedCard = card;
-        } else if (secondFlippedCard == null) {
-            // Second card flipped
-            secondFlippedCard = card;
-            canFlip = false;
-
-            // Check for match after a short delay
-            PauseTransition pause = new PauseTransition(Duration.seconds(1));
-            pause.setOnFinished(e -> checkMatch());
-            pause.play();
-        }
-    }
-
-    private void checkMatch() {
-        if (firstFlippedCard.getAnimal().equals(secondFlippedCard.getAnimal())) {
-            // Match found!
-            firstFlippedCard.setMatched(true);
-            secondFlippedCard.setMatched(true);
-
-            // Update score
-            if (currentPlayer == 1) {
-                player1Score++;
-                player1ScoreLabel.setText(String.valueOf(player1Score));
-            } else {
-                player2Score++;
-                player2ScoreLabel.setText(String.valueOf(player2Score));
-            }
-
-            // Mark matched cards visually
-            markCardAsMatched(firstFlippedCard);
-            markCardAsMatched(secondFlippedCard);
-
-            // Same player continues
-        } else {
-            // No match - flip cards back
-            flipCardBack(firstFlippedCard);
-            flipCardBack(secondFlippedCard);
-
-            // Switch turns
-            currentPlayer = (currentPlayer == 1) ? 2 : 1;
-            updateTurnIndicator();
-        }
-
-        // Reset flipped cards
-        firstFlippedCard = null;
-        secondFlippedCard = null;
-        canFlip = true;
-
-        // Check if game is over
-        checkGameOver();
-    }
-
-    private void markCardAsMatched(Card card) {
-        Button button = findCardButton(card);
-        if (button != null) {
+    private void updateCardButtonAppearance(Button button, Card card) {
+        if (card.isMatched()) {
+            button.setText(card.getAnimal());
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #10B981, #059669);"
                     + "-fx-text-fill: white;"
@@ -267,13 +187,19 @@ public class GameBoardController implements App.DataReceiver {
                     + "-fx-opacity: 0.7;"
                     + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 4);"
             );
-        }
-    }
-
-    private void flipCardBack(Card card) {
-        Button button = findCardButton(card);
-        if (button != null) {
-            card.setFlipped(false);
+        } else if (card.isFlipped()) {
+            button.setText(card.getAnimal());
+            button.setStyle(
+                    "-fx-background-color: white;"
+                    + "-fx-text-fill: #333333;"
+                    + "-fx-font-size: 40;"
+                    + "-fx-background-radius: 12;"
+                    + "-fx-border-color: #E879F9;"
+                    + "-fx-border-width: 3;"
+                    + "-fx-border-radius: 12;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(232, 121, 249, 0.4), 12, 0, 0, 4);"
+            );
+        } else {
             button.setText("?");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
@@ -287,101 +213,280 @@ public class GameBoardController implements App.DataReceiver {
         }
     }
 
-    private Button findCardButton(Card card) {
-        int index = cards.indexOf(card);
-        int row = index / gridSize;
-        int col = index % gridSize;
-        return cardButtons[row][col];
+    private void handleCardClick(Card card) {
+        if (!isMyTurn()) {
+            showInfo("Not Your Turn", "Please wait for your turn");
+            return;
+        }
+
+        if (card.isFlipped() || card.isMatched()) {
+            return;
+        }
+
+        // Send flip card message to server
+        networkManager.flipCard(card.getId());
+    }
+
+    private void setupNetworkHandlers() {
+        networkManager.setMessageHandler(message -> {
+            handleNetworkMessage(message);
+        });
+    }
+
+    private void handleNetworkMessage(Message message) {
+        switch (message.getType()) {
+            case CARD_FLIPPED:
+                handleCardFlipped(message);
+                break;
+            case MATCH_FOUND:
+                handleMatchFound(message);
+                break;
+            case NO_MATCH:
+                handleNoMatch(message);
+                break;
+            case TURN_CHANGED:
+                handleTurnChanged(message);
+                break;
+            case SCORE_UPDATE:
+                handleScoreUpdate(message);
+                break;
+            case GAME_OVER:
+                handleGameOver(message);
+                break;
+            case PLAYER_LEFT:
+                handlePlayerLeft(message);
+                break;
+            case ERROR:
+                handleError(message);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Network message handlers
+    private void handleCardFlipped(Message message) {
+        int cardId = message.getData().get("cardId").getAsInt();
+
+        javafx.application.Platform.runLater(() -> {
+            for (Card card : gameState.getCards()) {
+                if (card.getId() == cardId) {
+                    card.setFlipped(true);
+                    Button button = cardButtonMap.get(cardId);
+                    if (button != null) {
+                        updateCardButtonAppearance(button, card);
+                    }
+                    break;
+                }
+            }
+        });
+    }
+
+    private void handleMatchFound(Message message) {
+        int card1Id = message.getData().get("card1Id").getAsInt();
+        int card2Id = message.getData().get("card2Id").getAsInt();
+
+        javafx.application.Platform.runLater(() -> {
+            for (Card card : gameState.getCards()) {
+                if (card.getId() == card1Id || card.getId() == card2Id) {
+                    card.setMatched(true);
+                    Button button = cardButtonMap.get(card.getId());
+                    if (button != null) {
+                        updateCardButtonAppearance(button, card);
+                    }
+                }
+            }
+        });
+    }
+
+    private void handleNoMatch(Message message) {
+        int card1Id = message.getData().get("card1Id").getAsInt();
+        int card2Id = message.getData().get("card2Id").getAsInt();
+
+        javafx.application.Platform.runLater(() -> {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000);
+                    javafx.application.Platform.runLater(() -> {
+                        for (Card card : gameState.getCards()) {
+                            if (card.getId() == card1Id || card.getId() == card2Id) {
+                                card.setFlipped(false);
+                                Button button = cardButtonMap.get(card.getId());
+                                if (button != null) {
+                                    updateCardButtonAppearance(button, card);
+                                }
+                            }
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+        });
+    }
+
+    private void handleTurnChanged(Message message) {
+        String currentTurnPlayer = message.getData().get("currentTurn").getAsString();
+        javafx.application.Platform.runLater(() -> {
+            // Convert player name to turn number
+            int turnNumber = currentTurnPlayer.equals(gameState.getPlayer1Name()) ? 1 : 2;
+            gameState.setCurrentTurn(turnNumber);
+            updateTurnIndicator();
+        });
+    }
+
+    private void handleScoreUpdate(Message message) {
+        int player1Score = message.getData().get("player1Score").getAsInt();
+        int player2Score = message.getData().get("player2Score").getAsInt();
+        javafx.application.Platform.runLater(() -> {
+            gameState.setPlayer1Score(player1Score);
+            gameState.setPlayer2Score(player2Score);
+            updateScores();
+        });
+    }
+
+    private void handleGameOver(Message message) {
+        String winner = message.getData().get("winner").getAsString();
+        int player1Score = message.getData().get("player1Score").getAsInt();
+        int player2Score = message.getData().get("player2Score").getAsInt();
+        String currentPlayerName = networkManager.getCurrentPlayerName();
+
+        javafx.application.Platform.runLater(() -> {
+            String winnerText;
+            if (winner.equals("tie")) {
+                winnerText = "It's a Tie! 🤝";
+            } else if (winner.equals(currentPlayerName)) {
+                winnerText = "You Win! 🎉";
+            } else {
+                winnerText = winner + " Wins! 🎉";
+            }
+            turnIndicatorLabel.setText(winnerText);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(winnerText);
+            alert.setContentText("Final Score:\n"
+                    + gameState.getPlayer1Name() + ": " + player1Score + "\n"
+                    + gameState.getPlayer2Name() + ": " + player2Score);
+            alert.showAndWait();
+        });
+    }
+
+    private void handlePlayerLeft(Message message) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Player Left");
+            alert.setHeaderText("Opponent Disconnected");
+            alert.setContentText("The other player has left the game");
+            alert.showAndWait();
+
+            try {
+                networkManager.disconnect();
+                App.setRoot("home");
+            } catch (IOException e) {
+                showError("Navigation Error", "Failed to return to home");
+            }
+        });
+    }
+
+    private void handleError(Message message) {
+        String errorMessage = message.getData().get("message").getAsString();
+        javafx.application.Platform.runLater(() -> {
+            showError("Error", errorMessage);
+        });
+    }
+
+    private void updateScores() {
+        player1ScoreLabel.setText(String.valueOf(gameState.getPlayer1Score()));
+        player2ScoreLabel.setText(String.valueOf(gameState.getPlayer2Score()));
     }
 
     private void updateTurnIndicator() {
-        if (currentPlayer == 1) {
-            turnIndicatorLabel.setText("Player 1's Turn");
+        int currentTurn = gameState.getCurrentTurn();
+        boolean isPlayer1Turn = (currentTurn == 1);
+
+        if (isPlayer1Turn) {
+            turnIndicatorLabel.setText(gameState.getPlayer1Name() + "'s Turn");
             player1TurnLabel.setVisible(true);
             player2TurnLabel.setVisible(false);
-
-            // Highlight player 1 card
             player1Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
                     + "-fx-border-color: #10B981; -fx-border-width: 3; -fx-border-radius: 15; "
-                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 15, 0, 0, 5);"
-            );
+                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 15, 0, 0, 5);");
             player2Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;"
-            );
+                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
         } else {
-            turnIndicatorLabel.setText("Player 2's Turn");
+            turnIndicatorLabel.setText(gameState.getPlayer2Name() + "'s Turn");
             player1TurnLabel.setVisible(false);
             player2TurnLabel.setVisible(true);
-            player2TurnLabel.setText("Your turn!");
-
-            // Highlight player 2 card
             player2Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
                     + "-fx-border-color: #3B82F6; -fx-border-width: 3; -fx-border-radius: 15; "
-                    + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 15, 0, 0, 5);"
-            );
+                    + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 15, 0, 0, 5);");
             player1Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;"
-            );
+                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
         }
     }
 
-    private void checkGameOver() {
-        boolean allMatched = cards.stream().allMatch(Card::isMatched);
-
-        if (allMatched) {
-            canFlip = false;
-
-            // Determine winner
-            String winnerText;
-            if (player1Score > player2Score) {
-                winnerText = "Player 1 Wins! 🎉";
-            } else if (player2Score > player1Score) {
-                winnerText = "Player 2 Wins! 🎉";
-            } else {
-                winnerText = "It's a Tie! 🤝";
-            }
-
-            turnIndicatorLabel.setText(winnerText);
-
-            // TODO: Show game over dialog
-            System.out.println("Game Over! " + winnerText);
-            System.out.println("Final Score - Player 1: " + player1Score + ", Player 2: " + player2Score);
+    private boolean isMyTurn() {
+        if (gameState == null) {
+            return false;
         }
+        String myName = networkManager.getCurrentPlayerName();
+        int currentTurn = gameState.getCurrentTurn();
+        if (currentTurn == 1) {
+            return myName.equals(gameState.getPlayer1Name());
+        } else {
+            return myName.equals(gameState.getPlayer2Name());
+        }
+    }
+
+    private int getGridSize() {
+        String gridSizeStr = gameState.getGridSize();
+        if (gridSizeStr.equals("4x4")) {
+            return 4;
+        }
+        if (gridSizeStr.equals("6x6")) {
+            return 6;
+        }
+        return 4;
     }
 
     private void setupButtonHover(Button button) {
         if (button == null) {
             return;
         }
-
-        button.setOnMouseEntered(e -> {
-            button.setOpacity(0.7);
-        });
-
-        button.setOnMouseExited(e -> {
-            button.setOpacity(1.0);
-        });
+        button.setOnMouseEntered(e -> button.setOpacity(0.7));
+        button.setOnMouseExited(e -> button.setOpacity(1.0));
     }
 
     @FXML
     private void onLeave() {
+        if (networkManager.isConnected()) {
+            networkManager.disconnect();
+        }
         try {
             App.setRoot("home");
         } catch (IOException e) {
-            e.printStackTrace();
+            showError("Navigation Error", "Failed to return to home");
         }
     }
 
-    public void setRoomCode(String roomCode) {
-        this.roomCode = roomCode;
-        roomCodeLabel.setText(roomCode);
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
-    public void setGridSize(int gridSize) {
-        this.gridSize = gridSize;
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
     }
 }

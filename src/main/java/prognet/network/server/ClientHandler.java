@@ -1,13 +1,21 @@
 package prognet.network.server;
 
-import prognet.common.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import prognet.common.Card;
+import prognet.common.Message;
+import prognet.common.MessageType;
+
 public class ClientHandler extends Thread {
+
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class.getName());
     private static final Gson gson = new Gson();
 
@@ -79,13 +87,24 @@ public class ClientHandler extends Thread {
     }
 
     private void handleCreateRoom(Message message) {
+        System.out.println("=== CREATE_ROOM Request ===");
         playerName = message.getDataString("playerName");
         String gridSize = message.getDataString("gridSize");
         String theme = message.getDataString("theme");
 
+        System.out.println("Player: " + playerName);
+        System.out.println("Grid Size: " + gridSize);
+        System.out.println("Theme: " + theme);
+
         String roomCode = roomManager.createRoom(gridSize, theme);
+        System.out.println("Room created with code: " + roomCode);
+        System.out.println("Total active rooms: " + roomManager.getRoomCount());
+
         currentRoom = roomManager.getRoom(roomCode);
+        System.out.println("Retrieved room from manager: " + (currentRoom != null ? "SUCCESS" : "FAILED"));
+
         currentRoom.addPlayer(this, playerName);
+        System.out.println("Player added to room: " + playerName);
 
         JsonObject data = new JsonObject();
         data.addProperty("roomCode", roomCode);
@@ -94,25 +113,37 @@ public class ClientHandler extends Thread {
         data.addProperty("theme", theme);
 
         sendMessage(new Message(MessageType.ROOM_CREATED, data).toJson());
+        System.out.println("ROOM_CREATED message sent to client");
+        System.out.println("=== CREATE_ROOM Complete ===");
     }
 
     private void handleJoinRoom(Message message) {
+        System.out.println("=== JOIN_ROOM Request ===");
         playerName = message.getDataString("playerName");
         String roomCode = message.getDataString("roomCode");
+
+        System.out.println("Player: " + playerName);
+        System.out.println("Room Code: " + roomCode);
+        System.out.println("Total active rooms: " + roomManager.getRoomCount());
 
         currentRoom = roomManager.getRoom(roomCode);
 
         if (currentRoom == null) {
+            System.out.println("ERROR: Room not found - " + roomCode);
             sendError("Room not found");
             return;
         }
+        System.out.println("Room found: " + roomCode);
 
         if (currentRoom.isFull()) {
+            System.out.println("ERROR: Room is full - " + roomCode);
             sendError("Room is full");
             return;
         }
+        System.out.println("Room has space available");
 
         currentRoom.addPlayer(this, playerName);
+        System.out.println("Player added to room: " + playerName);
 
         JsonObject data = new JsonObject();
         data.addProperty("roomCode", roomCode);
@@ -120,11 +151,14 @@ public class ClientHandler extends Thread {
         data.add("gameState", gson.toJsonTree(currentRoom.getGameState()));
 
         sendMessage(new Message(MessageType.ROOM_JOINED, data).toJson());
+        System.out.println("ROOM_JOINED message sent to client");
 
         // Notify other player
         JsonObject notifyData = new JsonObject();
         notifyData.addProperty("playerName", playerName);
         currentRoom.sendToOther(this, new Message(MessageType.PLAYER_JOINED, notifyData).toJson());
+        System.out.println("PLAYER_JOINED notification sent to other player");
+        System.out.println("=== JOIN_ROOM Complete ===");
     }
 
     private void handleStartGame(Message message) {
@@ -182,10 +216,11 @@ public class ClientHandler extends Thread {
             for (int i = 0; i < currentRoom.getGameState().getCards().size(); i++) {
                 Card card = currentRoom.getGameState().getCards().get(i);
                 if (card.isFlipped() && !card.isMatched()) {
-                    if (card1 == -1)
-                        card1 = i;
-                    else
+                    if (card1 == -1) {
+                        card1 = i; 
+                    }else {
                         card2 = i;
+                    }
                 }
             }
 
@@ -250,12 +285,15 @@ public class ClientHandler extends Thread {
         }
 
         try {
-            if (in != null)
+            if (in != null) {
                 in.close();
-            if (out != null)
+            }
+            if (out != null) {
                 out.close();
-            if (socket != null)
+            }
+            if (socket != null) {
                 socket.close();
+            }
         } catch (IOException e) {
             LOGGER.warning("Error closing resources: " + e.getMessage());
         }

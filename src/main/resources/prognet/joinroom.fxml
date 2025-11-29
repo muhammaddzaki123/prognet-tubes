@@ -40,9 +40,21 @@
                 <!-- Subtitle -->
                 <Label text="Enter Room Code" styleClass="label-secondary">
                     <VBox.margin>
-                        <Insets bottom="20" />
+                        <Insets bottom="10" />
                     </VBox.margin>
                 </Label>
+
+                <!-- Player Name Input -->
+                <VBox alignment="CENTER" spacing="8">
+                    <children>
+                        <Label text="Your Name" styleClass="label-secondary" />
+                        <TextField fx:id="playerNameField" promptText="Enter your name"
+                            style="-fx-background-color: white; -fx-border-color: #3B82F6; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12; -fx-font-size: 14; -fx-max-width: 340;" />
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="15" />
+                    </VBox.margin>
+                </VBox>
 
                 <!-- Room Code Input Section -->
                 <VBox alignment="CENTER" spacing="15">

@@ -14,8 +14,11 @@ D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\server\UDPBroadcastSe
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\server\RoomManager.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\client\UDPDiscoveryClient.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\common\MessageType.java
+D:\Koding\Java\prognet-tubes\src\main\java\prognet\util\NetworkConfig.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\server\Room.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\controller\CreateRoomController.java
+D:\Koding\Java\prognet-tubes\src\main\java\prognet\controller\GameBoardController.java
+D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\client\NetworkManager.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\common\Card.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\controller\BaseController.java
 D:\Koding\Java\prognet-tubes\src\main\java\prognet\network\server\ClientHandler.java

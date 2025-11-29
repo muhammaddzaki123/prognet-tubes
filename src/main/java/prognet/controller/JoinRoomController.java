@@ -2,6 +2,8 @@ package prognet.controller;
 
 import java.io.IOException;
 
+import com.google.gson.Gson;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -10,6 +12,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import prognet.App;
+import prognet.common.GameState;
+import prognet.common.Message;
+import prognet.network.client.NetworkManager;
 
 public class JoinRoomController {
 
@@ -18,6 +23,9 @@ public class JoinRoomController {
 
     @FXML
     private Button backBtn;
+
+    @FXML
+    private TextField playerNameField;
 
     @FXML
     private TextField digit1;
@@ -44,9 +52,13 @@ public class JoinRoomController {
     private Button joinBtn;
 
     private TextField[] digitFields;
+    private NetworkManager networkManager;
+    private final Gson gson = new Gson();
 
     @FXML
     public void initialize() {
+        networkManager = NetworkManager.getInstance();
+
         // Initialize digit fields array
         digitFields = new TextField[]{digit1, digit2, digit3, digit4, digit5, digit6};
 
@@ -59,6 +71,16 @@ public class JoinRoomController {
         // Setup button hover effects
         setupButtonHover(backBtn);
         setupJoinButtonHover();
+
+        // Setup network message handler
+        // IMPORTANT: Set handler in initialize to catch all messages
+        System.out.println("JoinRoomController: Setting up message handler in initialize");
+        setupNetworkHandlers();
+
+        // Connect to server if not already connected
+        if (!networkManager.isConnected()) {
+            connectToServer();
+        }
 
         // Focus first digit on load
         Platform.runLater(() -> digit1.requestFocus());
@@ -180,28 +202,120 @@ public class JoinRoomController {
         try {
             App.setRoot("home");
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Navigation Error", "Failed to return to home screen", AlertType.ERROR);
         }
     }
 
     @FXML
     private void onJoinRoom() {
+        String playerName = playerNameField.getText().trim();
         String roomCode = fullCodeInput.getText();
+
+        if (playerName.isEmpty()) {
+            showAlert("Invalid Name", "Please enter your name", AlertType.WARNING);
+            return;
+        }
 
         if (roomCode.length() != 6) {
             showAlert("Invalid Code", "Please enter a valid 6-digit room code.", AlertType.WARNING);
             return;
         }
 
-        // TODO: Implement actual room joining logic with network client
-        // For now, navigate to waiting room with room code
-        try {
-            App.setRoot("waitingroom", roomCode);
-        } catch (IOException e) {
-            showAlert("Error", "Failed to join room: " + e.getMessage(), AlertType.ERROR);
+        if (!networkManager.isConnected()) {
+            showAlert("Connection Error", "Not connected to server. Please try again.", AlertType.ERROR);
+            return;
         }
 
-        // Later: Add GameClient.connect(roomCode) logic here
+        // Re-setup message handler right before joining to ensure it's active
+        // (in case another controller overwrote it)
+        System.out.println("JoinRoomController: Re-setting up message handler before joining room");
+        setupNetworkHandlers();
+
+        // Join room via network
+        System.out.println("JoinRoomController: Joining room " + roomCode + " as " + playerName);
+        networkManager.joinRoom(playerName, roomCode);
+
+        // Disable button while waiting for response
+        joinBtn.setDisable(true);
+        joinBtn.setText("Joining...");
+    }
+
+    private void connectToServer() {
+        boolean connected = networkManager.connect();
+
+        if (!connected) {
+            Platform.runLater(() -> {
+                showAlert("Connection Failed",
+                        "Could not connect to game server. Please make sure the server is running.",
+                        AlertType.ERROR);
+            });
+        }
+    }
+
+    private void setupNetworkHandlers() {
+        networkManager.setMessageHandler(message -> {
+            handleNetworkMessage(message);
+        });
+    }
+
+    private void handleNetworkMessage(Message message) {
+        System.out.println("JoinRoomController received message: " + message.getType());
+        switch (message.getType()) {
+            case ROOM_JOINED:
+                handleRoomJoined(message);
+                break;
+            case GAME_STARTED:
+                handleGameStarted(message);
+                break;
+            case ERROR:
+                handleError(message);
+                break;
+            default:
+                System.out.println("Unhandled message type in JoinRoomController: " + message.getType());
+                break;
+        }
+    }
+
+    private void handleRoomJoined(Message message) {
+        System.out.println("ROOM_JOINED message received!");
+        String roomCode = message.getData().get("roomCode").getAsString();
+        System.out.println("Navigating to waiting room with code: " + roomCode);
+
+        Platform.runLater(() -> {
+            try {
+                // Navigate to waiting room
+                App.setRoot("waitingroom", roomCode);
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert("Navigation Error", "Failed to join room", AlertType.ERROR);
+                // Re-enable button
+                joinBtn.setDisable(false);
+                joinBtn.setText("🚪  Join Room");
+            }
+        });
+    }
+
+    private void handleGameStarted(Message message) {
+        GameState gameState = gson.fromJson(message.getData().get("gameState"), GameState.class);
+
+        Platform.runLater(() -> {
+            try {
+                App.setRoot("gameboard", gameState);
+            } catch (IOException e) {
+                showAlert("Navigation Error", "Failed to start game", AlertType.ERROR);
+            }
+        });
+    }
+
+    private void handleError(Message message) {
+        String errorMessage = message.getData().get("message").getAsString();
+
+        Platform.runLater(() -> {
+            showAlert("Error", errorMessage, AlertType.ERROR);
+            // Re-enable button
+            joinBtn.setDisable(false);
+            joinBtn.setText("🚪  Join Room");
+        });
     }
 
     private void showAlert(String title, String content, AlertType type) {

@@ -7,6 +7,7 @@ module prognet {
 
     opens prognet to javafx.fxml;
     opens prognet.controller to javafx.fxml;
+    opens prognet.common to com.google.gson;
 
     exports prognet;
     exports prognet.network.client;

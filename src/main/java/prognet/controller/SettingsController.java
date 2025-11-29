@@ -2,6 +2,9 @@ package prognet.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import prognet.util.NetworkConfig;
 
 public class SettingsController {
 
@@ -33,6 +36,18 @@ public class SettingsController {
     @FXML
     private Button patternGeometricBtn;
 
+    // Network Configuration
+    @FXML
+    private TextField serverHostField;
+    @FXML
+    private TextField serverPortField;
+    @FXML
+    private Label networkStatusLabel;
+    @FXML
+    private Button saveNetworkBtn;
+    @FXML
+    private Button resetNetworkBtn;
+
     private Runnable onCloseHandler;
 
     // Current selections
@@ -47,6 +62,7 @@ public class SettingsController {
     @FXML
     public void initialize() {
         // Initial selection state is already set in FXML
+        loadNetworkConfig();
     }
 
     // Grid Size Selection
@@ -172,5 +188,63 @@ public class SettingsController {
 
     public String getSelectedPattern() {
         return selectedPattern;
+    }
+
+    // Network Configuration Methods
+    private void loadNetworkConfig() {
+        NetworkConfig config = NetworkConfig.getInstance();
+        serverHostField.setText(config.getServerHost());
+        serverPortField.setText(String.valueOf(config.getServerPort()));
+        networkStatusLabel.setText("");
+        networkStatusLabel.setStyle("-fx-text-fill: #666666;");
+    }
+
+    @FXML
+    private void onSaveNetworkConfig() {
+        String host = serverHostField.getText().trim();
+        String portText = serverPortField.getText().trim();
+
+        // Validate port
+        try {
+            int port = Integer.parseInt(portText);
+            if (port < 1 || port > 65535) {
+                networkStatusLabel.setText("⚠ Port harus antara 1-65535");
+                networkStatusLabel.setStyle("-fx-text-fill: #EF4444;");
+                return;
+            }
+
+            // Validate host
+            if (host.isEmpty()) {
+                networkStatusLabel.setText("⚠ Host tidak boleh kosong");
+                networkStatusLabel.setStyle("-fx-text-fill: #EF4444;");
+                return;
+            }
+
+            // Save configuration
+            NetworkConfig config = NetworkConfig.getInstance();
+            config.setServerHost(host);
+            config.setServerPort(port);
+            config.saveConfig();
+
+            networkStatusLabel.setText("✓ Konfigurasi berhasil disimpan");
+            networkStatusLabel.setStyle("-fx-text-fill: #10B981;");
+
+            System.out.println("Network config saved - Host: " + host + ", Port: " + port);
+        } catch (NumberFormatException e) {
+            networkStatusLabel.setText("⚠ Port harus berupa angka");
+            networkStatusLabel.setStyle("-fx-text-fill: #EF4444;");
+        }
+    }
+
+    @FXML
+    private void onResetNetworkConfig() {
+        NetworkConfig config = NetworkConfig.getInstance();
+        config.resetToDefaults();
+        loadNetworkConfig();
+
+        networkStatusLabel.setText("✓ Konfigurasi direset ke default");
+        networkStatusLabel.setStyle("-fx-text-fill: #10B981;");
+
+        System.out.println("Network config reset to defaults");
     }
 }
