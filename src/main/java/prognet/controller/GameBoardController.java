@@ -196,13 +196,17 @@ public class GameBoardController implements App.DataReceiver {
         System.out.println("updateCardButtonAppearance: animal=" + card.getAnimal() + ", emoji=" + emoji + ", isFlipped=" + card.isFlipped() + ", isMatched=" + card.isMatched());
 
         if (card.isMatched()) {
-            button.setText(emoji);
+            // Use graphic instead of text for better emoji rendering
+            javafx.scene.control.Label emojiLabel = new javafx.scene.control.Label(emoji);
+            emojiLabel.setStyle(
+                    "-fx-font-size: 48px;"
+                    + "-fx-font-family: 'Segoe UI Emoji';"
+                    + "-fx-text-fill: black;"
+            );
+            button.setGraphic(emojiLabel);
+            button.setText("");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #10B981, #059669);"
-                    + "-fx-text-fill: white;"
-                    + "-fx-font-size: 48px;"
-                    + "-fx-font-weight: bold;"
-                    + "-fx-font-family: 'Segoe UI Emoji';"
                     + "-fx-background-radius: 12;"
                     + "-fx-opacity: 0.9;"
                     + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 15, 0, 0, 5);"
@@ -388,23 +392,118 @@ public class GameBoardController implements App.DataReceiver {
         String currentPlayerName = networkManager.getCurrentPlayerName();
 
         javafx.application.Platform.runLater(() -> {
+            // Update final scores
+            gameState.setPlayer1Score(player1Score);
+            gameState.setPlayer2Score(player2Score);
+            updateScores();
+
+            // Determine winner and styling
             String winnerText;
+            String headerStyle;
+            Alert.AlertType alertType;
+
             if (winner.equals("tie")) {
                 winnerText = "It's a Tie! 🤝";
+                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+                alertType = Alert.AlertType.INFORMATION;
+                turnIndicatorLabel.setText("🤝 GAME TIED 🤝");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;");
             } else if (winner.equals(currentPlayerName)) {
-                winnerText = "You Win! 🎉";
-            } else {
-                winnerText = winner + " Wins! 🎉";
-            }
-            turnIndicatorLabel.setText(winnerText);
+                winnerText = "🎉 YOU WIN! 🎉";
+                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+                alertType = Alert.AlertType.INFORMATION;
+                turnIndicatorLabel.setText("🏆 YOU WON! 🏆");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10B981;");
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game Over");
-            alert.setHeaderText(winnerText);
-            alert.setContentText("Final Score:\n"
-                    + gameState.getPlayer1Name() + ": " + player1Score + "\n"
-                    + gameState.getPlayer2Name() + ": " + player2Score);
-            alert.showAndWait();
+                // Highlight winning player card with celebration effect
+                if (currentPlayerName.equals(gameState.getPlayer1Name())) {
+                    player1Card.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
+                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
+                    );
+                } else {
+                    player2Card.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
+                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
+                    );
+                }
+            } else {
+                winnerText = "😔 " + winner + " Wins! 😔";
+                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+                alertType = Alert.AlertType.WARNING;
+                turnIndicatorLabel.setText("💔 YOU LOST 💔");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
+
+                // Highlight winning opponent card
+                if (winner.equals(gameState.getPlayer1Name())) {
+                    player1Card.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
+                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
+                    );
+                    // Dim losing player card
+                    player2Card.setStyle(
+                            "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                            + "-fx-opacity: 0.6;"
+                    );
+                } else {
+                    player2Card.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
+                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
+                    );
+                    // Dim losing player card
+                    player1Card.setStyle(
+                            "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                            + "-fx-opacity: 0.6;"
+                    );
+                }
+            }
+
+            // Hide turn indicators
+            player1TurnLabel.setVisible(false);
+            player2TurnLabel.setVisible(false);
+
+            // Create custom styled alert
+            Alert alert = new Alert(alertType);
+            alert.setTitle("🎮 Game Over");
+            alert.setHeaderText(null);
+
+            // Create custom content
+            Label headerLabel = new Label(winnerText);
+            headerLabel.setStyle(headerStyle);
+
+            Label scoreLabel = new Label(
+                    "\n📊 Final Score:\n\n"
+                    + "🎯 " + gameState.getPlayer1Name() + ": " + player1Score + " points\n"
+                    + "🎯 " + gameState.getPlayer2Name() + ": " + player2Score + " points"
+            );
+            scoreLabel.setStyle("-fx-font-size: 16px; -fx-padding: 10 0 10 0;");
+
+            javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+            content.getChildren().addAll(headerLabel, scoreLabel);
+            content.setStyle("-fx-padding: 20; -fx-alignment: center;");
+
+            alert.getDialogPane().setContent(content);
+            alert.getDialogPane().setMinWidth(400);
+
+            // Show alert and return to home after closing
+            alert.showAndWait().ifPresent(response -> {
+                try {
+                    networkManager.disconnect();
+                    App.setRoot("home");
+                } catch (IOException e) {
+                    showError("Navigation Error", "Failed to return to home");
+                }
+            });
         });
     }
 
