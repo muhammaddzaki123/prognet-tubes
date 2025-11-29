@@ -1,10 +1,17 @@
 package prognet.network.server;
 
-import prognet.common.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import prognet.common.Card;
+import prognet.common.GameState;
 
 public class Room {
+
     private String roomCode;
     private GameState gameState;
     private ClientHandler host;
@@ -19,6 +26,7 @@ public class Room {
 
     private void initAnimalsByTheme() {
         animalsByTheme = new HashMap<>();
+        animalsByTheme.put("animals", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog");
         animalsByTheme.put("jungle", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog");
         animalsByTheme.put("forest", "sloth,redpanda,warthog,antelope,tiger,lemur,toucan,orangutan");
         animalsByTheme.put("savanna", "rhino,warthog,antelope,lemur,tiger,crocodile,orangutan,toucan");
@@ -63,10 +71,20 @@ public class Room {
 
     private void initializeCards() {
         String theme = gameState.getTheme();
-        String[] animals = animalsByTheme.get(theme).split(",");
+        System.out.println("Room.initializeCards: theme = " + theme);
+
+        String animalList = animalsByTheme.get(theme);
+        if (animalList == null) {
+            System.out.println("WARNING: Theme '" + theme + "' not found, using default 'animals'");
+            animalList = animalsByTheme.get("animals");
+        }
+
+        String[] animals = animalList.split(",");
+        System.out.println("Available animals: " + Arrays.toString(animals));
 
         int gridSize = Integer.parseInt(gameState.getGridSize().split("x")[0]);
         int totalPairs = (gridSize * gridSize) / 2;
+        System.out.println("Grid size: " + gridSize + "x" + gridSize + ", Total pairs: " + totalPairs);
 
         List<Card> cards = new ArrayList<>();
         for (int i = 0; i < totalPairs; i++) {
@@ -76,6 +94,7 @@ public class Room {
         }
 
         Collections.shuffle(cards);
+        System.out.println("Cards shuffled");
 
         // Reassign IDs after shuffle
         for (int i = 0; i < cards.size(); i++) {
@@ -142,10 +161,12 @@ public class Room {
     }
 
     public int getPlayerNumber(ClientHandler client) {
-        if (client == host)
+        if (client == host) {
             return 1;
-        if (client == guest)
+        }
+        if (client == guest) {
             return 2;
+        }
         return 0;
     }
 

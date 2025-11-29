@@ -66,10 +66,12 @@ public class GameBoardController implements App.DataReceiver {
 
     private Button[][] cardButtons;
     private final Map<Integer, Button> cardButtonMap = new HashMap<>();
+    private final Map<String, String> animalEmojis = new HashMap<>();
 
     @FXML
     public void initialize() {
         networkManager = NetworkManager.getInstance();
+        initAnimalEmojis();
         setupButtonHover(leaveBtn);
 
         // Setup network message handler
@@ -103,6 +105,19 @@ public class GameBoardController implements App.DataReceiver {
         // Update scores and turn
         updateScores();
         updateTurnIndicator();
+    }
+
+    private void initAnimalEmojis() {
+        animalEmojis.put("tiger", "🐯");
+        animalEmojis.put("sloth", "🦥");
+        animalEmojis.put("toucan", "🦜");
+        animalEmojis.put("orangutan", "🦧");
+        animalEmojis.put("lemur", "🐒");
+        animalEmojis.put("crocodile", "🐊");
+        animalEmojis.put("redpanda", "🦝");
+        animalEmojis.put("warthog", "🐗");
+        animalEmojis.put("rhino", "🦏");
+        animalEmojis.put("antelope", "🦌");
     }
 
     private void setupGameBoard() {
@@ -146,7 +161,7 @@ public class GameBoardController implements App.DataReceiver {
                 cardButton.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #D946EF, #A855F7);"
                         + "-fx-text-fill: white;"
-                        + "-fx-font-size: 40;"
+                        + "-fx-font-size: 48;"
                         + "-fx-font-weight: bold;"
                         + "-fx-background-radius: 12;"
                         + "-fx-cursor: hand;"
@@ -161,7 +176,7 @@ public class GameBoardController implements App.DataReceiver {
                 cardButton.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
                         + "-fx-text-fill: white;"
-                        + "-fx-font-size: 40;"
+                        + "-fx-font-size: 48;"
                         + "-fx-font-weight: bold;"
                         + "-fx-background-radius: 12;"
                         + "-fx-cursor: hand;"
@@ -177,22 +192,24 @@ public class GameBoardController implements App.DataReceiver {
     }
 
     private void updateCardButtonAppearance(Button button, Card card) {
+        String emoji = animalEmojis.getOrDefault(card.getAnimal(), "❓");
+
         if (card.isMatched()) {
-            button.setText(card.getAnimal());
+            button.setText(emoji);
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #10B981, #059669);"
                     + "-fx-text-fill: white;"
-                    + "-fx-font-size: 40;"
+                    + "-fx-font-size: 48;"
                     + "-fx-background-radius: 12;"
                     + "-fx-opacity: 0.7;"
                     + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 4);"
             );
         } else if (card.isFlipped()) {
-            button.setText(card.getAnimal());
+            button.setText(emoji);
             button.setStyle(
                     "-fx-background-color: white;"
                     + "-fx-text-fill: #333333;"
-                    + "-fx-font-size: 40;"
+                    + "-fx-font-size: 48;"
                     + "-fx-background-radius: 12;"
                     + "-fx-border-color: #E879F9;"
                     + "-fx-border-width: 3;"
