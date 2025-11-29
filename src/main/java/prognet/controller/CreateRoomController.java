@@ -150,7 +150,14 @@ public class CreateRoomController {
 
     @FXML
     private void onStartGame() {
-        // TODO: Implement start game functionality
+        // TODO: Implement start game functionality with network
         System.out.println("Starting game with room code: " + roomCode);
+
+        // Navigate to game board
+        try {
+            App.setRoot("gameboard", roomCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
