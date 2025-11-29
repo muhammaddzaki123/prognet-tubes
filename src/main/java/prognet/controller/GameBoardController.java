@@ -193,30 +193,41 @@ public class GameBoardController implements App.DataReceiver {
 
     private void updateCardButtonAppearance(Button button, Card card) {
         String emoji = animalEmojis.getOrDefault(card.getAnimal(), "❓");
+        System.out.println("updateCardButtonAppearance: animal=" + card.getAnimal() + ", emoji=" + emoji + ", isFlipped=" + card.isFlipped() + ", isMatched=" + card.isMatched());
 
         if (card.isMatched()) {
             button.setText(emoji);
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #10B981, #059669);"
                     + "-fx-text-fill: white;"
-                    + "-fx-font-size: 48;"
+                    + "-fx-font-size: 48px;"
+                    + "-fx-font-weight: bold;"
+                    + "-fx-font-family: 'Segoe UI Emoji';"
                     + "-fx-background-radius: 12;"
-                    + "-fx-opacity: 0.7;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 12, 0, 0, 4);"
+                    + "-fx-opacity: 0.9;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 15, 0, 0, 5);"
             );
+            button.setDisable(true); // Disable matched cards
         } else if (card.isFlipped()) {
-            button.setText(emoji);
+            // Use graphic instead of text for better emoji rendering
+            javafx.scene.control.Label emojiLabel = new javafx.scene.control.Label(emoji);
+            emojiLabel.setStyle(
+                    "-fx-font-size: 48px;"
+                    + "-fx-font-family: 'Segoe UI Emoji';"
+                    + "-fx-text-fill: black;"
+            );
+            button.setGraphic(emojiLabel);
+            button.setText("");
             button.setStyle(
-                    "-fx-background-color: white;"
-                    + "-fx-text-fill: #333333;"
-                    + "-fx-font-size: 48;"
+                    "-fx-background-color: linear-gradient(to bottom right, #FCD34D, #FBBF24);"
                     + "-fx-background-radius: 12;"
-                    + "-fx-border-color: #E879F9;"
+                    + "-fx-border-color: #F59E0B;"
                     + "-fx-border-width: 3;"
                     + "-fx-border-radius: 12;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(232, 121, 249, 0.4), 12, 0, 0, 4);"
+                    + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 12, 0, 0, 4);"
             );
         } else {
+            button.setGraphic(null);
             button.setText("?");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
@@ -284,14 +295,20 @@ public class GameBoardController implements App.DataReceiver {
     // Network message handlers
     private void handleCardFlipped(Message message) {
         int cardId = message.getData().get("cardId").getAsInt();
+        System.out.println("handleCardFlipped: cardId=" + cardId);
 
         javafx.application.Platform.runLater(() -> {
             for (Card card : gameState.getCards()) {
                 if (card.getId() == cardId) {
+                    System.out.println("Found card: id=" + card.getId() + ", animal=" + card.getAnimal() + ", isFlipped=" + card.isFlipped());
                     card.setFlipped(true);
                     Button button = cardButtonMap.get(cardId);
                     if (button != null) {
+                        System.out.println("Updating button appearance for card: " + card.getAnimal());
                         updateCardButtonAppearance(button, card);
+                        System.out.println("Button text after update: " + button.getText());
+                    } else {
+                        System.out.println("ERROR: Button not found for cardId " + cardId);
                     }
                     break;
                 }
@@ -344,11 +361,13 @@ public class GameBoardController implements App.DataReceiver {
 
     private void handleTurnChanged(Message message) {
         String currentTurnPlayer = message.getData().get("currentTurn").getAsString();
+        System.out.println("GameBoardController: Turn changed to " + currentTurnPlayer);
         javafx.application.Platform.runLater(() -> {
             // Convert player name to turn number
             int turnNumber = currentTurnPlayer.equals(gameState.getPlayer1Name()) ? 1 : 2;
             gameState.setCurrentTurn(turnNumber);
             updateTurnIndicator();
+            System.out.println("GameBoardController: Turn indicator updated. Current turn: " + turnNumber + " (My turn: " + isMyTurn() + ")");
         });
     }
 

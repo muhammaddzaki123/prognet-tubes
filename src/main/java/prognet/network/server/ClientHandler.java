@@ -217,8 +217,8 @@ public class ClientHandler extends Thread {
                 Card card = currentRoom.getGameState().getCards().get(i);
                 if (card.isFlipped() && !card.isMatched()) {
                     if (card1 == -1) {
-                        card1 = i; 
-                    }else {
+                        card1 = i;
+                    } else {
                         card2 = i;
                     }
                 }
@@ -241,6 +241,24 @@ public class ClientHandler extends Thread {
 
             MessageType type = isMatch ? MessageType.MATCH_FOUND : MessageType.NO_MATCH;
             currentRoom.broadcast(new Message(type, matchData).toJson());
+
+            // Broadcast turn change if no match (turn was switched in checkMatch)
+            if (!isMatch) {
+                JsonObject turnData = new JsonObject();
+                int currentTurn = currentRoom.getGameState().getCurrentTurn();
+                String currentPlayer = currentTurn == 1
+                        ? currentRoom.getGameState().getPlayer1Name()
+                        : currentRoom.getGameState().getPlayer2Name();
+                turnData.addProperty("currentTurn", currentPlayer);
+                currentRoom.broadcast(new Message(MessageType.TURN_CHANGED, turnData).toJson());
+                System.out.println("Turn changed to player " + currentTurn + " (" + currentPlayer + ")");
+            }
+
+            // Also broadcast score update
+            JsonObject scoreData = new JsonObject();
+            scoreData.addProperty("player1Score", currentRoom.getGameState().getPlayer1Score());
+            scoreData.addProperty("player2Score", currentRoom.getGameState().getPlayer2Score());
+            currentRoom.broadcast(new Message(MessageType.SCORE_UPDATE, scoreData).toJson());
 
             if (currentRoom.getGameState().isGameOver()) {
                 JsonObject gameOverData = new JsonObject();

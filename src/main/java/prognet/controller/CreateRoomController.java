@@ -330,11 +330,11 @@ public class CreateRoomController {
             startGameBtn.setDisable(false);
 
             // Show notification
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Player Joined");
-            alert.setHeaderText(null);
-            alert.setContentText(playerName + " has joined the room!");
-            alert.show();
+            // Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            // alert.setTitle("Player Joined");
+            // alert.setHeaderText(null);
+            // alert.setContentText(playerName + " has joined the room!");
+            // alert.show();
         });
 
         System.out.println("Player 2 joined: " + playerName);
