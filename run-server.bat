@@ -14,6 +14,7 @@ echo Press Ctrl+C to stop server
 echo ========================================
 echo.
 
-mvn exec:java "-Dexec.mainClass=prognet.ServerApp"
+set MAVEN_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED
+mvn exec:java "-Dexec.mainClass=prognet.ServerApp" 2>&1 | findstr /V /C:"sun.misc.Unsafe" /C:"terminally deprecated" /C:"HiddenClassDefiner"
 
 pause
