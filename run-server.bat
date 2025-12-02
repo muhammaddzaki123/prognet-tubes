@@ -13,5 +13,6 @@ echo Share above IP with clients to connect
 echo Press Ctrl+C to stop server
 echo ===================================
 echo.
-java -cp "bin;lib/*" Main server
+set JAVAFX_PATH=lib\javafx-sdk\lib
+java --module-path "%JAVAFX_PATH%" --add-modules javafx.controls,javafx.fxml -cp "bin;lib/*;%JAVAFX_PATH%/*" Main server
 pause
