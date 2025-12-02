@@ -390,6 +390,8 @@ public class GameBoardController implements App.DataReceiver {
         int player1Score = message.getData().get("player1Score").getAsInt();
         int player2Score = message.getData().get("player2Score").getAsInt();
         String currentPlayerName = networkManager.getCurrentPlayerName();
+        String player1Name = gameState.getPlayer1Name();
+        String player2Name = gameState.getPlayer2Name();
 
         javafx.application.Platform.runLater(() -> {
             // Update final scores
@@ -397,33 +399,74 @@ public class GameBoardController implements App.DataReceiver {
             gameState.setPlayer2Score(player2Score);
             updateScores();
 
-            // Determine winner and styling
+            // Determine result for each player
+            String player1Result;
+            String player2Result;
+            String player1ResultStyle;
+            String player2ResultStyle;
             String winnerText;
             String headerStyle;
             Alert.AlertType alertType;
 
             if (winner.equals("tie")) {
-                winnerText = "It's a Tie! 🤝";
-                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+                // SERI
+                player1Result = "SERI 🤝";
+                player2Result = "SERI 🤝";
+                player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+                player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+                winnerText = "Permainan Seri! 🤝";
+                headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
                 alertType = Alert.AlertType.INFORMATION;
-                turnIndicatorLabel.setText("🤝 GAME TIED 🤝");
+                turnIndicatorLabel.setText("🤝 SERI 🤝");
                 turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;");
-            } else if (winner.equals(currentPlayerName)) {
-                winnerText = "🎉 YOU WIN! 🎉";
-                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
-                alertType = Alert.AlertType.INFORMATION;
-                turnIndicatorLabel.setText("🏆 YOU WON! 🏆");
-                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10B981;");
 
-                // Highlight winning player card with celebration effect
-                if (currentPlayerName.equals(gameState.getPlayer1Name())) {
+                // Style both cards equally for tie
+                player1Card.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
+                        + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                        + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
+                );
+                player2Card.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
+                        + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                        + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
+                );
+            } else {
+                // Ada pemenang
+                if (winner.equals(player1Name)) {
+                    player1Result = "MENANG 🏆";
+                    player2Result = "KALAH 😔";
+                    player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+                    player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+
+                    // Style winner card (player 1)
                     player1Card.setStyle(
                             "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
                             + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
                             + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
                             + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
                     );
+                    // Style loser card (player 2)
+                    player2Card.setStyle(
+                            "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                            + "-fx-opacity: 0.7;"
+                    );
                 } else {
+                    player1Result = "KALAH 😔";
+                    player2Result = "MENANG 🏆";
+                    player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+                    player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+
+                    // Style loser card (player 1)
+                    player1Card.setStyle(
+                            "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                            + "-fx-opacity: 0.7;"
+                    );
+                    // Style winner card (player 2)
                     player2Card.setStyle(
                             "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
                             + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
@@ -431,42 +474,28 @@ public class GameBoardController implements App.DataReceiver {
                             + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
                     );
                 }
-            } else {
-                winnerText = "😔 " + winner + " Wins! 😔";
-                headerStyle = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
-                alertType = Alert.AlertType.WARNING;
-                turnIndicatorLabel.setText("💔 YOU LOST 💔");
-                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
 
-                // Highlight winning opponent card
-                if (winner.equals(gameState.getPlayer1Name())) {
-                    player1Card.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
-                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
-                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
-                    );
-                    // Dim losing player card
-                    player2Card.setStyle(
-                            "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
-                            + "-fx-opacity: 0.6;"
-                    );
+                // Set header text based on current player perspective
+                if (winner.equals(currentPlayerName)) {
+                    winnerText = "🎉 ANDA MENANG! 🎉";
+                    headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+                    alertType = Alert.AlertType.INFORMATION;
+                    turnIndicatorLabel.setText("🏆 ANDA MENANG! 🏆");
+                    turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10B981;");
                 } else {
-                    player2Card.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
-                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
-                            + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
-                    );
-                    // Dim losing player card
-                    player1Card.setStyle(
-                            "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
-                            + "-fx-opacity: 0.6;"
-                    );
+                    winnerText = "😔 ANDA KALAH 😔";
+                    headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+                    alertType = Alert.AlertType.WARNING;
+                    turnIndicatorLabel.setText("💔 ANDA KALAH 💔");
+                    turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
                 }
             }
+
+            // Update player subtitles with result
+            player1SubtitleLabel.setText(player1Result);
+            player1SubtitleLabel.setStyle(player1ResultStyle);
+            player2SubtitleLabel.setText(player2Result);
+            player2SubtitleLabel.setStyle(player2ResultStyle);
 
             // Hide turn indicators
             player1TurnLabel.setVisible(false);
@@ -474,36 +503,74 @@ public class GameBoardController implements App.DataReceiver {
 
             // Create custom styled alert
             Alert alert = new Alert(alertType);
-            alert.setTitle("🎮 Game Over");
+            alert.setTitle("🎮 Permainan Selesai");
             alert.setHeaderText(null);
 
-            // Create custom content
+            // Create custom content with detailed results
             Label headerLabel = new Label(winnerText);
             headerLabel.setStyle(headerStyle);
 
-            Label scoreLabel = new Label(
-                    "\n📊 Final Score:\n\n"
-                    + "🎯 " + gameState.getPlayer1Name() + ": " + player1Score + " points\n"
-                    + "🎯 " + gameState.getPlayer2Name() + ": " + player2Score + " points"
-            );
-            scoreLabel.setStyle("-fx-font-size: 16px; -fx-padding: 10 0 10 0;");
+            // Detailed score breakdown
+            Label scoreHeaderLabel = new Label("\n📊 Hasil Akhir:");
+            scoreHeaderLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #374151;");
 
-            javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
-            content.getChildren().addAll(headerLabel, scoreLabel);
-            content.setStyle("-fx-padding: 20; -fx-alignment: center;");
+            // Player 1 result
+            Label player1ResultLabel = new Label(
+                    "\n🎯 " + player1Name + ": " + player1Score + " poin"
+            );
+            player1ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
+
+            Label player1StatusLabel = new Label("   Status: " + player1Result);
+            player1StatusLabel.setStyle(player1ResultStyle);
+
+            // Player 2 result
+            Label player2ResultLabel = new Label(
+                    "\n🎯 " + player2Name + ": " + player2Score + " poin"
+            );
+            player2ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
+
+            Label player2StatusLabel = new Label("   Status: " + player2Result);
+            player2StatusLabel.setStyle(player2ResultStyle);
+
+            // Result summary
+            Label summaryLabel = new Label("\n" + (winner.equals("tie")
+                    ? "Kedua pemain memiliki skor yang sama!"
+                    : winner + " memenangkan permainan!"));
+            summaryLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-style: italic;");
+
+            javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(5);
+            content.getChildren().addAll(
+                    headerLabel,
+                    scoreHeaderLabel,
+                    player1ResultLabel,
+                    player1StatusLabel,
+                    player2ResultLabel,
+                    player2StatusLabel,
+                    summaryLabel
+            );
+            content.setStyle("-fx-padding: 25; -fx-alignment: center;");
 
             alert.getDialogPane().setContent(content);
-            alert.getDialogPane().setMinWidth(400);
+            alert.getDialogPane().setMinWidth(450);
+            alert.getDialogPane().setMinHeight(350);
+
+            // Customize button text
+            javafx.scene.control.ButtonType backToMenuButton = new javafx.scene.control.ButtonType(
+                    "🏠 Kembali ke Menu",
+                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE
+            );
+            alert.getButtonTypes().setAll(backToMenuButton);
 
             // Show alert and return to home after closing
-            alert.showAndWait().ifPresent(response -> {
-                try {
-                    networkManager.disconnect();
-                    App.setRoot("home");
-                } catch (IOException e) {
-                    showError("Navigation Error", "Failed to return to home");
-                }
-            });
+            alert.showAndWait();
+
+            // Always return to home after game over
+            try {
+                networkManager.disconnect();
+                App.setRoot("home");
+            } catch (IOException e) {
+                showError("Navigation Error", "Gagal kembali ke menu utama");
+            }
         });
     }
 
