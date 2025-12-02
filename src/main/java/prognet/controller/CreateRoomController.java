@@ -78,6 +78,7 @@ public class CreateRoomController {
     private Gson gson = new Gson();
     private boolean roomCreated = false;
     private boolean player2Joined = false;
+    private SettingsController settingsController;
 
     @FXML
     public void initialize() {
@@ -166,7 +167,7 @@ public class CreateRoomController {
 
     @FXML
     private void onSettings() {
-        SettingsOverlay.show(rootContainer);
+        settingsController = SettingsOverlay.show(rootContainer);
     }
 
     @FXML
@@ -218,9 +219,16 @@ public class CreateRoomController {
         System.out.println("CreateRoomController: Re-setting up message handler before creating room");
         setupNetworkHandlers();
 
-        // Get settings from SettingsOverlay (default values for now)
+        // Get settings from SettingsOverlay
         String gridSize = "4x4";
-        String theme = "animals";
+        String theme = "jungle";
+
+        if (settingsController != null) {
+            gridSize = settingsController.getSelectedGridSize();
+            String selectedTheme = settingsController.getSelectedTheme();
+            // Convert theme name to lowercase for backend
+            theme = selectedTheme.toLowerCase();
+        }
 
         System.out.println("CreateRoomController: Creating room - Player: " + playerName + ", GridSize: " + gridSize + ", Theme: " + theme);
         // Create room

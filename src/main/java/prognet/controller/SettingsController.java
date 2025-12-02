@@ -10,11 +10,11 @@ public class SettingsController {
 
     // Grid Size Buttons
     @FXML
-    private Button gridSize3x3Btn;
-    @FXML
     private Button gridSize4x4Btn;
     @FXML
-    private Button gridSize5x5Btn;
+    private Button gridSize6x6Btn;
+    @FXML
+    private Button gridSize8x8Btn;
 
     // Theme Buttons
     @FXML
@@ -67,29 +67,29 @@ public class SettingsController {
 
     // Grid Size Selection
     @FXML
-    private void onSelectGridSize3x3() {
-        selectGridSize(gridSize3x3Btn, "3x3");
-    }
-
-    @FXML
     private void onSelectGridSize4x4() {
         selectGridSize(gridSize4x4Btn, "4x4");
     }
 
     @FXML
-    private void onSelectGridSize5x5() {
-        selectGridSize(gridSize5x5Btn, "5x5");
+    private void onSelectGridSize6x6() {
+        selectGridSize(gridSize6x6Btn, "6x6");
+    }
+
+    @FXML
+    private void onSelectGridSize8x8() {
+        selectGridSize(gridSize8x8Btn, "8x8");
     }
 
     private void selectGridSize(Button selectedBtn, String size) {
         selectedGridSize = size;
         // Reset all grid size buttons
-        gridSize3x3Btn.getStyleClass().remove("setting-option-btn-selected");
-        gridSize3x3Btn.getStyleClass().add("setting-option-btn");
         gridSize4x4Btn.getStyleClass().remove("setting-option-btn-selected");
         gridSize4x4Btn.getStyleClass().add("setting-option-btn");
-        gridSize5x5Btn.getStyleClass().remove("setting-option-btn-selected");
-        gridSize5x5Btn.getStyleClass().add("setting-option-btn");
+        gridSize6x6Btn.getStyleClass().remove("setting-option-btn-selected");
+        gridSize6x6Btn.getStyleClass().add("setting-option-btn");
+        gridSize8x8Btn.getStyleClass().remove("setting-option-btn-selected");
+        gridSize8x8Btn.getStyleClass().add("setting-option-btn");
 
         // Set selected button
         selectedBtn.getStyleClass().remove("setting-option-btn");

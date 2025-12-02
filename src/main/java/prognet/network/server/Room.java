@@ -26,11 +26,12 @@ public class Room {
 
     private void initAnimalsByTheme() {
         animalsByTheme = new HashMap<>();
-        animalsByTheme.put("animals", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog");
-        animalsByTheme.put("jungle", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog");
-        animalsByTheme.put("forest", "sloth,redpanda,warthog,antelope,tiger,lemur,toucan,orangutan");
-        animalsByTheme.put("savanna", "rhino,warthog,antelope,lemur,tiger,crocodile,orangutan,toucan");
-        animalsByTheme.put("ocean", "crocodile,toucan,redpanda,sloth,lemur,antelope,warthog,rhino");
+        // Extended animal lists to support up to 8x8 grids (32 unique animals needed)
+        animalsByTheme.put("animals", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,rhino,antelope,elephant,giraffe,lion,zebra,monkey,parrot,snake,bear,wolf,fox,deer,rabbit,kangaroo,koala,penguin,seal,dolphin,whale,shark,octopus,turtle,frog");
+        animalsByTheme.put("jungle", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,monkey,parrot,snake,jaguar,panther,gorilla,chimpanzee,macaw,boa,python,anaconda,iguana,chameleon,frog,poison_dart_frog,howler_monkey,spider_monkey,capuchin,tamarin,coati,tapir,anteater,armadillo,peccary");
+        animalsByTheme.put("forest", "sloth,redpanda,warthog,antelope,tiger,lemur,toucan,orangutan,bear,wolf,fox,deer,rabbit,squirrel,owl,eagle,hawk,badger,hedgehog,moose,elk,beaver,raccoon,skunk,porcupine,lynx,wildcat,marten,woodpecker,jay,chipmunk,opossum");
+        animalsByTheme.put("savanna", "rhino,warthog,antelope,lemur,tiger,crocodile,orangutan,toucan,lion,elephant,giraffe,zebra,cheetah,leopard,hyena,wildebeest,buffalo,gazelle,impala,kudu,ostrich,vulture,eagle,secretary_bird,meerkat,mongoose,jackal,wild_dog,baboon,vervet_monkey,caracal,serval");
+        animalsByTheme.put("ocean", "crocodile,toucan,redpanda,sloth,lemur,antelope,warthog,rhino,dolphin,whale,shark,octopus,turtle,seal,penguin,sea_lion,otter,walrus,jellyfish,starfish,crab,lobster,shrimp,clownfish,seahorse,manta_ray,stingray,swordfish,tuna,sailfish,barracuda,pufferfish");
     }
 
     public synchronized boolean addPlayer(ClientHandler client, String playerName) {

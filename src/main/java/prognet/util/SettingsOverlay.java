@@ -11,7 +11,9 @@ import prognet.controller.SettingsController;
 
 public class SettingsOverlay {
 
-    public static void show(StackPane rootContainer) {
+    private static SettingsController currentController;
+
+    public static SettingsController show(StackPane rootContainer) {
         try {
             // Create semi-transparent overlay background
             Rectangle overlay = new Rectangle();
@@ -25,6 +27,7 @@ public class SettingsOverlay {
 
             // Get controller and set close handler
             SettingsController controller = loader.getController();
+            currentController = controller;
             controller.setOnClose(() -> {
                 rootContainer.getChildren().remove(overlay);
                 rootContainer.getChildren().remove(settingsContent);
@@ -40,9 +43,16 @@ public class SettingsOverlay {
             rootContainer.getChildren().add(overlay);
             rootContainer.getChildren().add(settingsContent);
 
+            return controller;
+
         } catch (IOException e) {
             System.err.println("Failed to load settings overlay: " + e.getMessage());
             e.printStackTrace();
+            return null;
         }
+    }
+
+    public static SettingsController getCurrentController() {
+        return currentController;
     }
 }

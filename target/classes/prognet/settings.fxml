@@ -31,11 +31,11 @@
             <Label text="Grid Size" style="-fx-font-size: 14; -fx-text-fill: #666666;" />
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <children>
-                    <Button fx:id="gridSize3x3Btn" text="3x3" onAction="#onSelectGridSize3x3"
-                        styleClass="setting-option-btn" prefWidth="90" prefHeight="40" />
                     <Button fx:id="gridSize4x4Btn" text="4x4" onAction="#onSelectGridSize4x4"
                         styleClass="setting-option-btn-selected" prefWidth="90" prefHeight="40" />
-                    <Button fx:id="gridSize5x5Btn" text="5x5" onAction="#onSelectGridSize5x5"
+                    <Button fx:id="gridSize6x6Btn" text="6x6" onAction="#onSelectGridSize6x6"
+                        styleClass="setting-option-btn" prefWidth="90" prefHeight="40" />
+                    <Button fx:id="gridSize8x8Btn" text="8x8" onAction="#onSelectGridSize8x8"
                         styleClass="setting-option-btn" prefWidth="90" prefHeight="40" />
                 </children>
             </HBox>
