@@ -173,6 +173,28 @@ public class NetworkManager {
         }
     }
 
+    /**
+     * Vote for rematch
+     */
+    public void voteRematch(boolean wantsRematch) {
+        if (client != null && client.isConnected()) {
+            client.voteRematch(wantsRematch);
+        } else {
+            LOGGER.warning("Cannot vote for rematch: not connected to server");
+        }
+    }
+
+    /**
+     * Leave to home (notifies server)
+     */
+    public void leaveToHome() {
+        if (client != null && client.isConnected()) {
+            client.leaveToHome();
+        } else {
+            LOGGER.warning("Cannot leave to home: not connected to server");
+        }
+    }
+
     // Getters
     public String getCurrentPlayerName() {
         return currentPlayerName;

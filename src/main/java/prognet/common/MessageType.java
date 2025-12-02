@@ -8,6 +8,8 @@ public enum MessageType {
     FLIP_CARD,
     CHAT_MESSAGE,
     DISCONNECT,
+    REMATCH_VOTE, // Player votes for rematch
+    LEAVE_TO_HOME, // Player leaves to home
 
     // Server → Client
     ROOM_CREATED,
@@ -21,5 +23,8 @@ public enum MessageType {
     SCORE_UPDATE,
     GAME_OVER,
     PLAYER_LEFT,
-    ERROR
+    ERROR,
+    REMATCH_VOTE_UPDATE, // Update on rematch votes
+    REMATCH_ACCEPTED, // Both players agreed to rematch
+    REMATCH_DECLINED // One player declined
 }

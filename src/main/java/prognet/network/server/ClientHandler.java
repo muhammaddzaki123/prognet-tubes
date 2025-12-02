@@ -77,6 +77,12 @@ public class ClientHandler extends Thread {
                 case DISCONNECT:
                     handleDisconnect();
                     break;
+                case REMATCH_VOTE:
+                    handleRematchVote(message);
+                    break;
+                case LEAVE_TO_HOME:
+                    handleLeaveToHome();
+                    break;
                 default:
                     sendError("Unknown message type");
             }
@@ -262,7 +268,24 @@ public class ClientHandler extends Thread {
 
             if (currentRoom.getGameState().isGameOver()) {
                 JsonObject gameOverData = new JsonObject();
-                gameOverData.add("gameState", gson.toJsonTree(currentRoom.getGameState()));
+                int player1Score = currentRoom.getGameState().getPlayer1Score();
+                int player2Score = currentRoom.getGameState().getPlayer2Score();
+                String winner;
+
+                if (player1Score > player2Score) {
+                    winner = currentRoom.getGameState().getPlayer1Name();
+                } else if (player2Score > player1Score) {
+                    winner = currentRoom.getGameState().getPlayer2Name();
+                } else {
+                    winner = "tie";
+                }
+
+                gameOverData.addProperty("winner", winner);
+                gameOverData.addProperty("player1Score", player1Score);
+                gameOverData.addProperty("player2Score", player2Score);
+                gameOverData.addProperty("player1TotalWins", currentRoom.getGameState().getPlayer1TotalWins());
+                gameOverData.addProperty("player2TotalWins", currentRoom.getGameState().getPlayer2TotalWins());
+
                 currentRoom.broadcast(new Message(MessageType.GAME_OVER, gameOverData).toJson());
             }
         }
@@ -329,5 +352,67 @@ public class ClientHandler extends Thread {
         JsonObject data = new JsonObject();
         data.addProperty("message", errorMessage);
         sendMessage(new Message(MessageType.ERROR, data).toJson());
+    }
+
+    private void handleRematchVote(Message message) {
+        if (currentRoom == null) {
+            sendError("Not in a room");
+            return;
+        }
+
+        boolean wantsRematch = message.getData().get("wantsRematch").getAsBoolean();
+        int playerNumber = currentRoom.getPlayerNumber(this);
+
+        currentRoom.voteRematch(playerNumber, wantsRematch);
+
+        // Broadcast vote update
+        JsonObject voteData = new JsonObject();
+        voteData.addProperty("player1WantsRematch", currentRoom.getGameState().isPlayer1WantsRematch());
+        voteData.addProperty("player2WantsRematch", currentRoom.getGameState().isPlayer2WantsRematch());
+        currentRoom.broadcast(new Message(MessageType.REMATCH_VOTE_UPDATE, voteData).toJson());
+
+        // If player declined, immediately notify and end
+        if (!wantsRematch) {
+            JsonObject declineData = new JsonObject();
+            declineData.addProperty("reason", playerName + " tidak ingin main lagi");
+            currentRoom.broadcast(new Message(MessageType.REMATCH_DECLINED, declineData).toJson());
+            return;
+        }
+
+        // Check if both players want rematch (only check when player votes YES)
+        if (currentRoom.bothPlayersWantRematch()) {
+            // Reset game for rematch
+            currentRoom.resetForRematch();
+
+            // Send rematch accepted message
+            JsonObject acceptData = new JsonObject();
+            acceptData.addProperty("message", "Both players agreed to rematch!");
+            currentRoom.broadcast(new Message(MessageType.REMATCH_ACCEPTED, acceptData).toJson());
+
+            // Start new game
+            JsonObject gameData = new JsonObject();
+            gameData.add("gameState", gson.toJsonTree(currentRoom.getGameState()));
+            currentRoom.broadcast(new Message(MessageType.GAME_STARTED, gameData).toJson());
+        }
+        // If only one player voted yes so far, just wait for the other player
+    }
+
+    private void handleLeaveToHome() {
+        if (currentRoom != null) {
+            // Mark this player as not wanting rematch
+            int playerNumber = currentRoom.getPlayerNumber(this);
+            currentRoom.voteRematch(playerNumber, false);
+
+            // Reset total wins when leaving to home
+            currentRoom.resetTotalWins();
+
+            // Notify other player that this player is leaving
+            JsonObject data = new JsonObject();
+            data.addProperty("reason", playerName + " kembali ke menu utama");
+            currentRoom.sendToOther(this, new Message(MessageType.REMATCH_DECLINED, data).toJson());
+        }
+
+        // Clean up connection
+        cleanup();
     }
 }

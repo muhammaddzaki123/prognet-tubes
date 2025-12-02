@@ -160,14 +160,13 @@ public class GameBoardController implements App.DataReceiver {
             if (!card.isFlipped() && !card.isMatched() && isMyTurn()) {
                 cardButton.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #D946EF, #A855F7);"
-                        + "-fx-text-fill: white;"
-                        + "-fx-font-size: 48;"
-                        + "-fx-font-weight: bold;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-cursor: hand;"
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);"
-                        + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;"
-                );
+                                + "-fx-text-fill: white;"
+                                + "-fx-font-size: 48;"
+                                + "-fx-font-weight: bold;"
+                                + "-fx-background-radius: 12;"
+                                + "-fx-cursor: hand;"
+                                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0, 0, 4);"
+                                + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;");
             }
         });
 
@@ -175,13 +174,12 @@ public class GameBoardController implements App.DataReceiver {
             if (!card.isFlipped() && !card.isMatched()) {
                 cardButton.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
-                        + "-fx-text-fill: white;"
-                        + "-fx-font-size: 48;"
-                        + "-fx-font-weight: bold;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-cursor: hand;"
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"
-                );
+                                + "-fx-text-fill: white;"
+                                + "-fx-font-size: 48;"
+                                + "-fx-font-weight: bold;"
+                                + "-fx-background-radius: 12;"
+                                + "-fx-cursor: hand;"
+                                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);");
             }
         });
 
@@ -193,55 +191,51 @@ public class GameBoardController implements App.DataReceiver {
 
     private void updateCardButtonAppearance(Button button, Card card) {
         String emoji = animalEmojis.getOrDefault(card.getAnimal(), "❓");
-        System.out.println("updateCardButtonAppearance: animal=" + card.getAnimal() + ", emoji=" + emoji + ", isFlipped=" + card.isFlipped() + ", isMatched=" + card.isMatched());
+        System.out.println("updateCardButtonAppearance: animal=" + card.getAnimal() + ", emoji=" + emoji
+                + ", isFlipped=" + card.isFlipped() + ", isMatched=" + card.isMatched());
 
         if (card.isMatched()) {
             // Use graphic instead of text for better emoji rendering
             javafx.scene.control.Label emojiLabel = new javafx.scene.control.Label(emoji);
             emojiLabel.setStyle(
                     "-fx-font-size: 48px;"
-                    + "-fx-font-family: 'Segoe UI Emoji';"
-                    + "-fx-text-fill: black;"
-            );
+                            + "-fx-font-family: 'Segoe UI Emoji';"
+                            + "-fx-text-fill: black;");
             button.setGraphic(emojiLabel);
             button.setText("");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #10B981, #059669);"
-                    + "-fx-background-radius: 12;"
-                    + "-fx-opacity: 0.9;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 15, 0, 0, 5);"
-            );
+                            + "-fx-background-radius: 12;"
+                            + "-fx-opacity: 0.9;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 15, 0, 0, 5);");
             button.setDisable(true); // Disable matched cards
         } else if (card.isFlipped()) {
             // Use graphic instead of text for better emoji rendering
             javafx.scene.control.Label emojiLabel = new javafx.scene.control.Label(emoji);
             emojiLabel.setStyle(
                     "-fx-font-size: 48px;"
-                    + "-fx-font-family: 'Segoe UI Emoji';"
-                    + "-fx-text-fill: black;"
-            );
+                            + "-fx-font-family: 'Segoe UI Emoji';"
+                            + "-fx-text-fill: black;");
             button.setGraphic(emojiLabel);
             button.setText("");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #FCD34D, #FBBF24);"
-                    + "-fx-background-radius: 12;"
-                    + "-fx-border-color: #F59E0B;"
-                    + "-fx-border-width: 3;"
-                    + "-fx-border-radius: 12;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 12, 0, 0, 4);"
-            );
+                            + "-fx-background-radius: 12;"
+                            + "-fx-border-color: #F59E0B;"
+                            + "-fx-border-width: 3;"
+                            + "-fx-border-radius: 12;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 12, 0, 0, 4);");
         } else {
             button.setGraphic(null);
             button.setText("?");
             button.setStyle(
                     "-fx-background-color: linear-gradient(to bottom right, #E879F9, #C084FC);"
-                    + "-fx-text-fill: white;"
-                    + "-fx-font-size: 40;"
-                    + "-fx-font-weight: bold;"
-                    + "-fx-background-radius: 12;"
-                    + "-fx-cursor: hand;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);"
-            );
+                            + "-fx-text-fill: white;"
+                            + "-fx-font-size: 40;"
+                            + "-fx-font-weight: bold;"
+                            + "-fx-background-radius: 12;"
+                            + "-fx-cursor: hand;"
+                            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);");
         }
     }
 
@@ -285,11 +279,23 @@ public class GameBoardController implements App.DataReceiver {
             case GAME_OVER:
                 handleGameOver(message);
                 break;
+            case GAME_STARTED:
+                handleGameStarted(message);
+                break;
             case PLAYER_LEFT:
                 handlePlayerLeft(message);
                 break;
             case ERROR:
                 handleError(message);
+                break;
+            case REMATCH_VOTE_UPDATE:
+                handleRematchVoteUpdate(message);
+                break;
+            case REMATCH_ACCEPTED:
+                handleRematchAccepted(message);
+                break;
+            case REMATCH_DECLINED:
+                handleRematchDeclined(message);
                 break;
             default:
                 break;
@@ -304,7 +310,8 @@ public class GameBoardController implements App.DataReceiver {
         javafx.application.Platform.runLater(() -> {
             for (Card card : gameState.getCards()) {
                 if (card.getId() == cardId) {
-                    System.out.println("Found card: id=" + card.getId() + ", animal=" + card.getAnimal() + ", isFlipped=" + card.isFlipped());
+                    System.out.println("Found card: id=" + card.getId() + ", animal=" + card.getAnimal()
+                            + ", isFlipped=" + card.isFlipped());
                     card.setFlipped(true);
                     Button button = cardButtonMap.get(cardId);
                     if (button != null) {
@@ -371,7 +378,8 @@ public class GameBoardController implements App.DataReceiver {
             int turnNumber = currentTurnPlayer.equals(gameState.getPlayer1Name()) ? 1 : 2;
             gameState.setCurrentTurn(turnNumber);
             updateTurnIndicator();
-            System.out.println("GameBoardController: Turn indicator updated. Current turn: " + turnNumber + " (My turn: " + isMyTurn() + ")");
+            System.out.println("GameBoardController: Turn indicator updated. Current turn: " + turnNumber
+                    + " (My turn: " + isMyTurn() + ")");
         });
     }
 
@@ -389,6 +397,12 @@ public class GameBoardController implements App.DataReceiver {
         String winner = message.getData().get("winner").getAsString();
         int player1Score = message.getData().get("player1Score").getAsInt();
         int player2Score = message.getData().get("player2Score").getAsInt();
+        int player1TotalWins = message.getData().has("player1TotalWins")
+                ? message.getData().get("player1TotalWins").getAsInt()
+                : 0;
+        int player2TotalWins = message.getData().has("player2TotalWins")
+                ? message.getData().get("player2TotalWins").getAsInt()
+                : 0;
         String currentPlayerName = networkManager.getCurrentPlayerName();
         String player1Name = gameState.getPlayer1Name();
         String player2Name = gameState.getPlayer2Name();
@@ -397,6 +411,8 @@ public class GameBoardController implements App.DataReceiver {
             // Update final scores
             gameState.setPlayer1Score(player1Score);
             gameState.setPlayer2Score(player2Score);
+            gameState.setPlayer1TotalWins(player1TotalWins);
+            gameState.setPlayer2TotalWins(player2TotalWins);
             updateScores();
 
             // Determine result for each player
@@ -423,16 +439,14 @@ public class GameBoardController implements App.DataReceiver {
                 // Style both cards equally for tie
                 player1Card.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
-                        + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                        + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
-                        + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
-                );
+                                + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                                + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                                + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);");
                 player2Card.setStyle(
                         "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
-                        + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                        + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
-                        + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
-                );
+                                + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                                + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                                + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);");
             } else {
                 // Ada pemenang
                 if (winner.equals(player1Name)) {
@@ -444,16 +458,14 @@ public class GameBoardController implements App.DataReceiver {
                     // Style winner card (player 1)
                     player1Card.setStyle(
                             "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
-                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
-                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
-                    );
+                                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                                    + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
+                                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);");
                     // Style loser card (player 2)
                     player2Card.setStyle(
                             "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
-                            + "-fx-opacity: 0.7;"
-                    );
+                                    + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                                    + "-fx-opacity: 0.7;");
                 } else {
                     player1Result = "KALAH 😔";
                     player2Result = "MENANG 🏆";
@@ -463,16 +475,14 @@ public class GameBoardController implements App.DataReceiver {
                     // Style loser card (player 1)
                     player1Card.setStyle(
                             "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
-                            + "-fx-opacity: 0.7;"
-                    );
+                                    + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                                    + "-fx-opacity: 0.7;");
                     // Style winner card (player 2)
                     player2Card.setStyle(
                             "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
-                            + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
-                            + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
-                            + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
-                    );
+                                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                                    + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
+                                    + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);");
                 }
 
                 // Set header text based on current player perspective
@@ -516,21 +526,25 @@ public class GameBoardController implements App.DataReceiver {
 
             // Player 1 result
             Label player1ResultLabel = new Label(
-                    "\n🎯 " + player1Name + ": " + player1Score + " poin"
-            );
+                    "\n🎯 " + player1Name + ": " + player1Score + " poin (Round)");
             player1ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
 
             Label player1StatusLabel = new Label("   Status: " + player1Result);
             player1StatusLabel.setStyle(player1ResultStyle);
 
+            Label player1TotalLabel = new Label("   🏆 Total Kemenangan: " + player1TotalWins);
+            player1TotalLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+
             // Player 2 result
             Label player2ResultLabel = new Label(
-                    "\n🎯 " + player2Name + ": " + player2Score + " poin"
-            );
+                    "\n🎯 " + player2Name + ": " + player2Score + " poin (Round)");
             player2ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
 
             Label player2StatusLabel = new Label("   Status: " + player2Result);
             player2StatusLabel.setStyle(player2ResultStyle);
+
+            Label player2TotalLabel = new Label("   🏆 Total Kemenangan: " + player2TotalWins);
+            player2TotalLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
 
             // Result summary
             Label summaryLabel = new Label("\n" + (winner.equals("tie")
@@ -544,33 +558,43 @@ public class GameBoardController implements App.DataReceiver {
                     scoreHeaderLabel,
                     player1ResultLabel,
                     player1StatusLabel,
+                    player1TotalLabel,
                     player2ResultLabel,
                     player2StatusLabel,
-                    summaryLabel
-            );
+                    player2TotalLabel,
+                    summaryLabel);
             content.setStyle("-fx-padding: 25; -fx-alignment: center;");
 
             alert.getDialogPane().setContent(content);
-            alert.getDialogPane().setMinWidth(450);
-            alert.getDialogPane().setMinHeight(350);
+            alert.getDialogPane().setMinWidth(500);
+            alert.getDialogPane().setMinHeight(400);
 
-            // Customize button text
-            javafx.scene.control.ButtonType backToMenuButton = new javafx.scene.control.ButtonType(
+            // Customize button text with rematch and home options
+            javafx.scene.control.ButtonType rematchButton = new javafx.scene.control.ButtonType(
+                    "🔄 Main Lagi",
+                    javafx.scene.control.ButtonBar.ButtonData.YES);
+            javafx.scene.control.ButtonType homeButton = new javafx.scene.control.ButtonType(
                     "🏠 Kembali ke Menu",
-                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE
-            );
-            alert.getButtonTypes().setAll(backToMenuButton);
+                    javafx.scene.control.ButtonBar.ButtonData.NO);
+            alert.getButtonTypes().setAll(rematchButton, homeButton);
 
-            // Show alert and return to home after closing
-            alert.showAndWait();
-
-            // Always return to home after game over
-            try {
-                networkManager.disconnect();
-                App.setRoot("home");
-            } catch (IOException e) {
-                showError("Navigation Error", "Gagal kembali ke menu utama");
-            }
+            // Show alert and handle response
+            alert.showAndWait().ifPresent(response -> {
+                if (response == rematchButton) {
+                    // Player wants rematch
+                    networkManager.voteRematch(true);
+                    showRematchWaitingDialog();
+                } else {
+                    // Player wants to go home
+                    networkManager.leaveToHome();
+                    try {
+                        networkManager.disconnect();
+                        App.setRoot("home");
+                    } catch (IOException e) {
+                        showError("Navigation Error", "Gagal kembali ke menu utama");
+                    }
+                }
+            });
         });
     }
 
@@ -588,6 +612,70 @@ public class GameBoardController implements App.DataReceiver {
             } catch (IOException e) {
                 showError("Navigation Error", "Failed to return to home");
             }
+        });
+    }
+
+    private void handleGameStarted(Message message) {
+        javafx.application.Platform.runLater(() -> {
+            // Close rematch waiting dialog if open
+            closeRematchWaitingDialog();
+
+            // Extract game state from message
+            com.google.gson.JsonObject gameStateJson = message.getData().get("gameState").getAsJsonObject();
+
+            // Update game state with new data
+            gameState.setGameOver(false);
+            gameState.setGameStarted(true);
+            gameState.setCurrentTurn(gameStateJson.get("currentTurn").getAsInt());
+
+            // Parse cards
+            com.google.gson.JsonArray cardsArray = gameStateJson.get("cards").getAsJsonArray();
+            java.util.List<Card> newCards = new java.util.ArrayList<>();
+            for (int i = 0; i < cardsArray.size(); i++) {
+                com.google.gson.JsonObject cardObj = cardsArray.get(i).getAsJsonObject();
+                Card card = new Card(
+                        cardObj.get("id").getAsInt(),
+                        cardObj.get("animal").getAsString());
+                card.setFlipped(cardObj.get("flipped").getAsBoolean());
+                card.setMatched(cardObj.get("matched").getAsBoolean());
+                newCards.add(card);
+            }
+            gameState.setCards(newCards);
+
+            // Reset UI state
+            player1TurnLabel.setVisible(false);
+            player2TurnLabel.setVisible(false);
+
+            // Reset player card styles to normal
+            player1Card.setStyle(
+                    "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
+                            + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
+            player2Card.setStyle(
+                    "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
+                            + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
+
+            // Reset subtitle labels based on player perspective
+            String myName = networkManager.getCurrentPlayerName();
+            if (myName.equals(gameState.getPlayer1Name())) {
+                player1SubtitleLabel.setText("You");
+                player1SubtitleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
+                player2SubtitleLabel.setText("Opponent");
+                player2SubtitleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
+            } else {
+                player1SubtitleLabel.setText("Opponent");
+                player1SubtitleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
+                player2SubtitleLabel.setText("You");
+                player2SubtitleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280;");
+            }
+
+            // Rebuild game board with new cards
+            setupGameBoard();
+
+            // Update scores and turn indicator
+            updateScores();
+            updateTurnIndicator();
+
+            System.out.println("Game restarted after rematch!");
         });
     }
 
@@ -613,22 +701,22 @@ public class GameBoardController implements App.DataReceiver {
             player2TurnLabel.setVisible(false);
             player1Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #10B981; -fx-border-width: 3; -fx-border-radius: 15; "
-                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 15, 0, 0, 5);");
+                            + "-fx-border-color: #10B981; -fx-border-width: 3; -fx-border-radius: 15; "
+                            + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 15, 0, 0, 5);");
             player2Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
+                            + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
         } else {
             turnIndicatorLabel.setText(gameState.getPlayer2Name() + "'s Turn");
             player1TurnLabel.setVisible(false);
             player2TurnLabel.setVisible(true);
             player2Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #3B82F6; -fx-border-width: 3; -fx-border-radius: 15; "
-                    + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 15, 0, 0, 5);");
+                            + "-fx-border-color: #3B82F6; -fx-border-width: 3; -fx-border-radius: 15; "
+                            + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 15, 0, 0, 5);");
             player1Card.setStyle(
                     "-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20 25 20 25; "
-                    + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
+                            + "-fx-border-color: #e0e0e0; -fx-border-width: 2; -fx-border-radius: 15;");
         }
     }
 
@@ -667,6 +755,7 @@ public class GameBoardController implements App.DataReceiver {
     @FXML
     private void onLeave() {
         if (networkManager.isConnected()) {
+            networkManager.leaveToHome();
             networkManager.disconnect();
         }
         try {
@@ -690,5 +779,146 @@ public class GameBoardController implements App.DataReceiver {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.show();
+    }
+
+    // Rematch dialog and waiting indicator
+    private Alert rematchWaitingAlert;
+
+    private void showRematchWaitingDialog() {
+        rematchWaitingAlert = new Alert(Alert.AlertType.INFORMATION);
+        rematchWaitingAlert.setTitle("⏳ Menunggu Lawan");
+        rematchWaitingAlert.setHeaderText(null);
+
+        Label waitingLabel = new Label(
+                "Menunggu keputusan lawan...\n\nAnda sudah memilih untuk main lagi.\nSilakan tunggu hingga lawan Anda membuat keputusan.");
+        waitingLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151; -fx-padding: 20;");
+
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+        content.getChildren().add(waitingLabel);
+        content.setStyle("-fx-alignment: center; -fx-padding: 20;");
+
+        rematchWaitingAlert.getDialogPane().setContent(content);
+        rematchWaitingAlert.getDialogPane().setMinWidth(400);
+        rematchWaitingAlert.getDialogPane().setMinHeight(200);
+
+        // Remove default buttons
+        rematchWaitingAlert.getButtonTypes().clear();
+
+        // Add cancel button
+        javafx.scene.control.ButtonType cancelButton = new javafx.scene.control.ButtonType(
+                "Batalkan",
+                javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+        rematchWaitingAlert.getButtonTypes().add(cancelButton);
+
+        // Handle cancel in a separate thread to avoid blocking
+        new Thread(() -> {
+            rematchWaitingAlert.showAndWait().ifPresent(response -> {
+                if (response == cancelButton) {
+                    javafx.application.Platform.runLater(() -> {
+                        networkManager.leaveToHome();
+                        try {
+                            networkManager.disconnect();
+                            App.setRoot("home");
+                        } catch (IOException ex) {
+                            showError("Navigation Error", "Gagal kembali ke menu utama");
+                        }
+                    });
+                }
+            });
+        }).start();
+    }
+
+    private void closeRematchWaitingDialog() {
+        if (rematchWaitingAlert != null && rematchWaitingAlert.isShowing()) {
+            rematchWaitingAlert.close();
+            rematchWaitingAlert = null;
+        }
+    }
+
+    private void handleRematchVoteUpdate(Message message) {
+        boolean player1Voted = message.getData().get("player1WantsRematch").getAsBoolean();
+        boolean player2Voted = message.getData().get("player2WantsRematch").getAsBoolean();
+
+        javafx.application.Platform.runLater(() -> {
+            gameState.setPlayer1WantsRematch(player1Voted);
+            gameState.setPlayer2WantsRematch(player2Voted);
+
+            // Update waiting dialog if shown
+            if (rematchWaitingAlert != null && rematchWaitingAlert.isShowing()) {
+                String myName = networkManager.getCurrentPlayerName();
+                String opponentName = myName.equals(gameState.getPlayer1Name())
+                        ? gameState.getPlayer2Name()
+                        : gameState.getPlayer1Name();
+
+                Label updatedLabel = new Label(
+                        "Menunggu keputusan " + opponentName + "...\n\n" +
+                                "Anda sudah memilih untuk main lagi.\n" +
+                                "Silakan tunggu hingga lawan Anda membuat keputusan.");
+                updatedLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151; -fx-padding: 20;");
+
+                javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+                content.getChildren().add(updatedLabel);
+                content.setStyle("-fx-alignment: center; -fx-padding: 20;");
+
+                rematchWaitingAlert.getDialogPane().setContent(content);
+            }
+        });
+    }
+
+    private void handleRematchAccepted(Message message) {
+        javafx.application.Platform.runLater(() -> {
+            closeRematchWaitingDialog();
+
+            // Show brief message
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("🎮 Main Lagi");
+            alert.setHeaderText(null);
+            alert.setContentText("Kedua pemain setuju untuk main lagi!\nGame baru akan dimulai...");
+            alert.show();
+
+            // Auto close after 2 seconds
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    javafx.application.Platform.runLater(() -> {
+                        if (alert.isShowing()) {
+                            alert.close();
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+
+            // Game will restart automatically via GAME_STARTED message from server
+        });
+    }
+
+    private void handleRematchDeclined(Message message) {
+        String reason = message.getData().has("reason") ? message.getData().get("reason").getAsString()
+                : "Salah satu pemain menolak";
+
+        javafx.application.Platform.runLater(() -> {
+            closeRematchWaitingDialog();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("❌ Tidak Main Lagi");
+            alert.setHeaderText(null);
+            alert.setContentText(reason + "\n\nKembali ke menu utama...");
+
+            javafx.scene.control.ButtonType okButton = new javafx.scene.control.ButtonType(
+                    "OK",
+                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(okButton);
+
+            alert.showAndWait();
+
+            try {
+                networkManager.disconnect();
+                App.setRoot("home");
+            } catch (IOException e) {
+                showError("Navigation Error", "Gagal kembali ke menu utama");
+            }
+        });
     }
 }

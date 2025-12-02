@@ -124,7 +124,8 @@ public class GameClient {
 
     public void sendMessage(Message message) {
         System.out.println("GameClient.sendMessage called for: " + message.getType());
-        System.out.println("  connected=" + connected + ", out=" + (out != null) + ", executorShutdown=" + executorService.isShutdown());
+        System.out.println("  connected=" + connected + ", out=" + (out != null) + ", executorShutdown="
+                + executorService.isShutdown());
 
         if (connected && out != null && !executorService.isShutdown()) {
             executorService.submit(() -> {
@@ -133,7 +134,8 @@ public class GameClient {
                 System.out.println("Message sent: " + message.getType());
             });
         } else {
-            System.out.println("WARNING: Message not sent! connected=" + connected + ", out=" + (out != null) + ", executorShutdown=" + executorService.isShutdown());
+            System.out.println("WARNING: Message not sent! connected=" + connected + ", out=" + (out != null)
+                    + ", executorShutdown=" + executorService.isShutdown());
         }
     }
 
@@ -170,6 +172,17 @@ public class GameClient {
         JsonObject data = new JsonObject();
         data.addProperty("message", chatMessage);
         sendMessage(new Message(MessageType.CHAT_MESSAGE, data));
+    }
+
+    public void voteRematch(boolean wantsRematch) {
+        JsonObject data = new JsonObject();
+        data.addProperty("wantsRematch", wantsRematch);
+        sendMessage(new Message(MessageType.REMATCH_VOTE, data));
+    }
+
+    public void leaveToHome() {
+        JsonObject data = new JsonObject();
+        sendMessage(new Message(MessageType.LEAVE_TO_HOME, data));
     }
 
     public void disconnect() {

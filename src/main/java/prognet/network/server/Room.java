@@ -27,11 +27,16 @@ public class Room {
     private void initAnimalsByTheme() {
         animalsByTheme = new HashMap<>();
         // Extended animal lists to support up to 8x8 grids (32 unique animals needed)
-        animalsByTheme.put("animals", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,rhino,antelope,elephant,giraffe,lion,zebra,monkey,parrot,snake,bear,wolf,fox,deer,rabbit,kangaroo,koala,penguin,seal,dolphin,whale,shark,octopus,turtle,frog");
-        animalsByTheme.put("jungle", "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,monkey,parrot,snake,jaguar,panther,gorilla,chimpanzee,macaw,boa,python,anaconda,iguana,chameleon,frog,poison_dart_frog,howler_monkey,spider_monkey,capuchin,tamarin,coati,tapir,anteater,armadillo,peccary");
-        animalsByTheme.put("forest", "sloth,redpanda,warthog,antelope,tiger,lemur,toucan,orangutan,bear,wolf,fox,deer,rabbit,squirrel,owl,eagle,hawk,badger,hedgehog,moose,elk,beaver,raccoon,skunk,porcupine,lynx,wildcat,marten,woodpecker,jay,chipmunk,opossum");
-        animalsByTheme.put("savanna", "rhino,warthog,antelope,lemur,tiger,crocodile,orangutan,toucan,lion,elephant,giraffe,zebra,cheetah,leopard,hyena,wildebeest,buffalo,gazelle,impala,kudu,ostrich,vulture,eagle,secretary_bird,meerkat,mongoose,jackal,wild_dog,baboon,vervet_monkey,caracal,serval");
-        animalsByTheme.put("ocean", "crocodile,toucan,redpanda,sloth,lemur,antelope,warthog,rhino,dolphin,whale,shark,octopus,turtle,seal,penguin,sea_lion,otter,walrus,jellyfish,starfish,crab,lobster,shrimp,clownfish,seahorse,manta_ray,stingray,swordfish,tuna,sailfish,barracuda,pufferfish");
+        animalsByTheme.put("animals",
+                "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,rhino,antelope,elephant,giraffe,lion,zebra,monkey,parrot,snake,bear,wolf,fox,deer,rabbit,kangaroo,koala,penguin,seal,dolphin,whale,shark,octopus,turtle,frog");
+        animalsByTheme.put("jungle",
+                "tiger,sloth,toucan,orangutan,lemur,crocodile,redpanda,warthog,monkey,parrot,snake,jaguar,panther,gorilla,chimpanzee,macaw,boa,python,anaconda,iguana,chameleon,frog,poison_dart_frog,howler_monkey,spider_monkey,capuchin,tamarin,coati,tapir,anteater,armadillo,peccary");
+        animalsByTheme.put("forest",
+                "sloth,redpanda,warthog,antelope,tiger,lemur,toucan,orangutan,bear,wolf,fox,deer,rabbit,squirrel,owl,eagle,hawk,badger,hedgehog,moose,elk,beaver,raccoon,skunk,porcupine,lynx,wildcat,marten,woodpecker,jay,chipmunk,opossum");
+        animalsByTheme.put("savanna",
+                "rhino,warthog,antelope,lemur,tiger,crocodile,orangutan,toucan,lion,elephant,giraffe,zebra,cheetah,leopard,hyena,wildebeest,buffalo,gazelle,impala,kudu,ostrich,vulture,eagle,secretary_bird,meerkat,mongoose,jackal,wild_dog,baboon,vervet_monkey,caracal,serval");
+        animalsByTheme.put("ocean",
+                "crocodile,toucan,redpanda,sloth,lemur,antelope,warthog,rhino,dolphin,whale,shark,octopus,turtle,seal,penguin,sea_lion,otter,walrus,jellyfish,starfish,crab,lobster,shrimp,clownfish,seahorse,manta_ray,stingray,swordfish,tuna,sailfish,barracuda,pufferfish");
     }
 
     public synchronized boolean addPlayer(ClientHandler client, String playerName) {
@@ -133,6 +138,13 @@ public class Room {
             boolean allMatched = gameState.getCards().stream().allMatch(Card::isMatched);
             if (allMatched) {
                 gameState.setGameOver(true);
+                // Increment total wins for the winner
+                if (gameState.getPlayer1Score() > gameState.getPlayer2Score()) {
+                    gameState.incrementPlayer1TotalWins();
+                } else if (gameState.getPlayer2Score() > gameState.getPlayer1Score()) {
+                    gameState.incrementPlayer2TotalWins();
+                }
+                // If tie, no one gets a win point
             }
 
             return true;
@@ -186,5 +198,36 @@ public class Room {
 
     public ClientHandler getGuest() {
         return guest;
+    }
+
+    // Rematch handling
+    public synchronized void voteRematch(int playerNumber, boolean wants) {
+        if (playerNumber == 1) {
+            gameState.setPlayer1WantsRematch(wants);
+        } else if (playerNumber == 2) {
+            gameState.setPlayer2WantsRematch(wants);
+        }
+    }
+
+    public synchronized boolean bothPlayersWantRematch() {
+        return gameState.isPlayer1WantsRematch() && gameState.isPlayer2WantsRematch();
+    }
+
+    public synchronized void resetForRematch() {
+        // Reset round scores and game state
+        gameState.resetRoundScores();
+        gameState.resetRematchVotes();
+        gameState.setGameOver(false);
+        gameState.setCurrentTurn(1);
+
+        // Keep total wins intact
+        // Re-initialize cards
+        initializeCards();
+        gameState.setGameStarted(true);
+    }
+
+    public synchronized void resetTotalWins() {
+        // Called when players return to home
+        gameState.resetTotalWins();
     }
 }
