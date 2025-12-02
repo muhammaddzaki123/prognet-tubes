@@ -60,6 +60,14 @@
                 <Button fx:id="howToPlayBtn" text="❓  How to Play" onAction="#onHowToPlay"
                     styleClass="btn-purple-outline" prefWidth="280" maxWidth="480">
                     <VBox.margin>
+                        <Insets bottom="10" />
+                    </VBox.margin>
+                </Button>
+
+                <!-- Configure Network Button -->
+                <Button fx:id="configNetworkBtn" text="⚙  Configure Network" onAction="#onConfigureNetwork"
+                    styleClass="btn-purple-outline" prefWidth="280" maxWidth="480">
+                    <VBox.margin>
                         <Insets bottom="20" />
                     </VBox.margin>
                 </Button>

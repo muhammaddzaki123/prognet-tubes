@@ -95,44 +95,4 @@
             </GridPane>
         </children>
     </VBox>
-
-    <!-- Network Configuration -->
-    <VBox spacing="12">
-        <children>
-            <Label text="Network Configuration" style="-fx-font-size: 14; -fx-text-fill: #666666;" />
-
-            <!-- Server Host -->
-            <VBox spacing="6">
-                <children>
-                    <Label text="Server Host:" style="-fx-font-size: 12; -fx-text-fill: #888888;" />
-                    <TextField fx:id="serverHostField" promptText="localhost atau IP address"
-                        style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-padding: 8;"
-                        prefHeight="35" />
-                </children>
-            </VBox>
-
-            <!-- Server Port -->
-            <VBox spacing="6">
-                <children>
-                    <Label text="Server Port:" style="-fx-font-size: 12; -fx-text-fill: #888888;" />
-                    <TextField fx:id="serverPortField" promptText="5000"
-                        style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-padding: 8;"
-                        prefHeight="35" prefWidth="150" />
-                </children>
-            </VBox>
-
-            <!-- Status Label -->
-            <Label fx:id="networkStatusLabel" text="" style="-fx-font-size: 12; -fx-padding: 5 0 0 0;" />
-
-            <!-- Action Buttons -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <children>
-                    <Button fx:id="saveNetworkBtn" text="Simpan" onAction="#onSaveNetworkConfig"
-                        styleClass="primary-btn" prefWidth="120" prefHeight="40" />
-                    <Button fx:id="resetNetworkBtn" text="Reset" onAction="#onResetNetworkConfig"
-                        styleClass="setting-option-btn" prefWidth="120" prefHeight="40" />
-                </children>
-            </HBox>
-        </children>
-    </VBox>
 </VBox>
