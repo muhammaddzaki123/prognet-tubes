@@ -334,6 +334,9 @@ public class GameBoardController implements App.DataReceiver {
                     }
                 }
             }
+
+            // Check if all cards are matched (game over)
+            checkGameCompletion();
         });
     }
 
@@ -690,5 +693,234 @@ public class GameBoardController implements App.DataReceiver {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.show();
+    }
+
+    /**
+     * Check if all cards have been matched (flipped) and trigger game over
+     */
+    private void checkGameCompletion() {
+        if (gameState == null || gameState.getCards() == null) {
+            return;
+        }
+
+        // Check if all cards are matched
+        boolean allMatched = gameState.getCards().stream()
+                .allMatch(Card::isMatched);
+
+        if (allMatched) {
+            System.out.println("All cards matched! Game over.");
+
+            // Delay slightly to allow final card animation to complete
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                    javafx.application.Platform.runLater(() -> {
+                        showGameOverDialog();
+                    });
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
+        }
+    }
+
+    /**
+     * Display game over dialog when all cards are matched
+     */
+    private void showGameOverDialog() {
+        int player1Score = gameState.getPlayer1Score();
+        int player2Score = gameState.getPlayer2Score();
+        String player1Name = gameState.getPlayer1Name();
+        String player2Name = gameState.getPlayer2Name();
+        String currentPlayerName = networkManager.getCurrentPlayerName();
+
+        // Determine winner
+        String winner;
+        String player1Result;
+        String player2Result;
+        String player1ResultStyle;
+        String player2ResultStyle;
+        String winnerText;
+        String headerStyle;
+        Alert.AlertType alertType;
+
+        if (player1Score == player2Score) {
+            // TIE
+            winner = "tie";
+            player1Result = "SERI 🤝";
+            player2Result = "SERI 🤝";
+            player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+            player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+            winnerText = "Permainan Seri! 🤝";
+            headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;";
+            alertType = Alert.AlertType.INFORMATION;
+            turnIndicatorLabel.setText("🤝 SERI 🤝");
+            turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;");
+
+            // Style both cards equally for tie
+            player1Card.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
+                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
+            );
+            player2Card.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom right, #FEF3C7, #FDE68A);"
+                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #F59E0B; -fx-border-width: 3; -fx-border-radius: 15;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.5), 20, 0, 0, 5);"
+            );
+        } else if (player1Score > player2Score) {
+            // Player 1 wins
+            winner = player1Name;
+            player1Result = "MENANG 🏆";
+            player2Result = "KALAH 😔";
+            player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+            player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+
+            // Style winner card (player 1)
+            player1Card.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom right, #D1FAE5, #A7F3D0);"
+                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #10B981; -fx-border-width: 4; -fx-border-radius: 15;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0, 0, 8);"
+            );
+            // Style loser card (player 2)
+            player2Card.setStyle(
+                    "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                    + "-fx-opacity: 0.7;"
+            );
+
+            if (winner.equals(currentPlayerName)) {
+                winnerText = "🎉 ANDA MENANG! 🎉";
+                headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+                alertType = Alert.AlertType.INFORMATION;
+                turnIndicatorLabel.setText("🏆 ANDA MENANG! 🏆");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10B981;");
+            } else {
+                winnerText = "😔 ANDA KALAH 😔";
+                headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+                alertType = Alert.AlertType.WARNING;
+                turnIndicatorLabel.setText("💔 ANDA KALAH 💔");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
+            }
+        } else {
+            // Player 2 wins
+            winner = player2Name;
+            player1Result = "KALAH 😔";
+            player2Result = "MENANG 🏆";
+            player1ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+            player2ResultStyle = "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+
+            // Style loser card (player 1)
+            player1Card.setStyle(
+                    "-fx-background-color: #F3F4F6; -fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #9CA3AF; -fx-border-width: 2; -fx-border-radius: 15;"
+                    + "-fx-opacity: 0.7;"
+            );
+            // Style winner card (player 2)
+            player2Card.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom right, #DBEAFE, #BFDBFE);"
+                    + "-fx-background-radius: 15; -fx-padding: 20 25 20 25;"
+                    + "-fx-border-color: #3B82F6; -fx-border-width: 4; -fx-border-radius: 15;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 25, 0, 0, 8);"
+            );
+
+            if (winner.equals(currentPlayerName)) {
+                winnerText = "🎉 ANDA MENANG! 🎉";
+                headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #10B981;";
+                alertType = Alert.AlertType.INFORMATION;
+                turnIndicatorLabel.setText("🏆 ANDA MENANG! 🏆");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10B981;");
+            } else {
+                winnerText = "😔 ANDA KALAH 😔";
+                headerStyle = "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #EF4444;";
+                alertType = Alert.AlertType.WARNING;
+                turnIndicatorLabel.setText("💔 ANDA KALAH 💔");
+                turnIndicatorLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
+            }
+        }
+
+        // Update player subtitles with result
+        player1SubtitleLabel.setText(player1Result);
+        player1SubtitleLabel.setStyle(player1ResultStyle);
+        player2SubtitleLabel.setText(player2Result);
+        player2SubtitleLabel.setStyle(player2ResultStyle);
+
+        // Hide turn indicators
+        player1TurnLabel.setVisible(false);
+        player2TurnLabel.setVisible(false);
+
+        // Create custom styled alert
+        Alert alert = new Alert(alertType);
+        alert.setTitle("🎮 Permainan Selesai");
+        alert.setHeaderText(null);
+
+        // Create custom content with detailed results
+        Label headerLabel = new Label(winnerText);
+        headerLabel.setStyle(headerStyle);
+
+        // Detailed score breakdown
+        Label scoreHeaderLabel = new Label("\n📊 Hasil Akhir:");
+        scoreHeaderLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #374151;");
+
+        // Player 1 result
+        Label player1ResultLabel = new Label(
+                "\n🎯 " + player1Name + ": " + player1Score + " poin"
+        );
+        player1ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
+
+        Label player1StatusLabel = new Label("   Status: " + player1Result);
+        player1StatusLabel.setStyle(player1ResultStyle);
+
+        // Player 2 result
+        Label player2ResultLabel = new Label(
+                "\n🎯 " + player2Name + ": " + player2Score + " poin"
+        );
+        player2ResultLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1F2937;");
+
+        Label player2StatusLabel = new Label("   Status: " + player2Result);
+        player2StatusLabel.setStyle(player2ResultStyle);
+
+        // Result summary
+        Label summaryLabel = new Label("\n" + (winner.equals("tie")
+                ? "Kedua pemain memiliki skor yang sama!"
+                : winner + " memenangkan permainan!"));
+        summaryLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6B7280; -fx-font-style: italic;");
+
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(5);
+        content.getChildren().addAll(
+                headerLabel,
+                scoreHeaderLabel,
+                player1ResultLabel,
+                player1StatusLabel,
+                player2ResultLabel,
+                player2StatusLabel,
+                summaryLabel
+        );
+        content.setStyle("-fx-padding: 25; -fx-alignment: center;");
+
+        alert.getDialogPane().setContent(content);
+        alert.getDialogPane().setMinWidth(450);
+        alert.getDialogPane().setMinHeight(350);
+
+        // Customize button text
+        javafx.scene.control.ButtonType backToMenuButton = new javafx.scene.control.ButtonType(
+                "🏠 Kembali ke Menu",
+                javafx.scene.control.ButtonBar.ButtonData.OK_DONE
+        );
+        alert.getButtonTypes().setAll(backToMenuButton);
+
+        // Show alert and return to home after closing
+        alert.showAndWait();
+
+        // Return to home after game over
+        try {
+            networkManager.disconnect();
+            App.setRoot("home");
+        } catch (IOException e) {
+            showError("Navigation Error", "Gagal kembali ke menu utama");
+        }
     }
 }
