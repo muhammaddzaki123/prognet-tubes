@@ -408,6 +408,15 @@ public class GameBoardController implements App.DataReceiver {
         String player2Name = gameState.getPlayer2Name();
 
         javafx.application.Platform.runLater(() -> {
+            // Debug logging
+            System.out.println("=== GAME OVER DEBUG ===");
+            System.out.println("Winner from server: " + winner);
+            System.out.println("Current player name: " + currentPlayerName);
+            System.out.println("Player 1 name: " + player1Name);
+            System.out.println("Player 2 name: " + player2Name);
+            System.out.println("Player 1 score: " + player1Score);
+            System.out.println("Player 2 score: " + player2Score);
+
             // Update final scores
             gameState.setPlayer1Score(player1Score);
             gameState.setPlayer2Score(player2Score);
